@@ -33,20 +33,20 @@ def fetch_env_variables(config):
     return ' '.join([f'-e {key}={value}' for key, value in env_vars.items()])
 
 
-def run(project, mode, image_name, **kwargs):
+def run(mode, image_name, image_tag, **kwargs):
     user = getpass.getuser()
     volumes = kwargs['volumes'].format(root=get_root_dir(), user=user)
     if kwargs['network']:
         kwargs['network'] = f"--network {kwargs['network']}"
 
     timestamp = datetime.datetime.now().strftime("%y-%m-%d_%H.%M.%S")
-    cmd = _base_cmd.format(image_name=get_image_name(project, mode, image_name),
-                           image_tag=get_image_tag(mode),
+    cmd = _base_cmd.format(image_name=image_name,
+                           image_tag=image_tag,
                            name=f"{getpass.getuser()}_{mode}_{timestamp}",
                            keep_container=kwargs['keep_container'],
                            interactive=kwargs['interactive'],
                            environment=kwargs['environment'],
-                           network=f"--network {kwargs['network']}",
+                           network=kwargs['network'],
                            ports=kwargs['ports'],
                            volumes=volumes,
                            gpu=kwargs['gpu'],
@@ -62,14 +62,13 @@ if __name__ == '__main__':
         config.read(os.path.join('docker', 'run.cfg'))
 
         if 'synthetic_images' in config['run_image']:
-            image_types = get_image_types(config['run_image']['syntetic_images'].split(','))
+            image_types = get_image_types(config['run_image']['synthetic_images'].split(','))
         else:
             image_types = get_image_types()
 
         parser = argparse.ArgumentParser()
         parser.add_argument("image", choices=image_types, help="Docker image to run")
         parser.add_argument("-k", "--keep", help="keep the image after execution", action='store_true')
-        parser.add_argument("-i", "--image_name", help="Image naming override")
         parser.add_argument("-c", "--command", help="Command for image override")
         parser.add_argument("-n", "--network", help="Network for image override", default='')
         parser.add_argument("-g", "--use-gpu", dest='use_gpu', default=False, action='store_true',
@@ -96,4 +95,7 @@ if __name__ == '__main__':
                 if not run_config[key] and key in config[args.image]:
                     run_config[key] = config[args.image][key]
 
-        sys.exit(run(get_default_project_name(), args.image, args.image_name, **run_config))
+        image_name = get_image_name(config, args.image)
+        image_tag = get_image_tag(config, args.image)
+
+        sys.exit(run(args.image, image_name, image_tag, **run_config))

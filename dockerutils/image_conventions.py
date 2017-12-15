@@ -26,27 +26,27 @@ def get_root_dir():
 
     return _ROOT_DIR
 
+
 def get_default_project_name():
     return os.path.basename(get_root_dir()).lower()
 
 
-def get_image_name(project, mode, image_name=None):
-    if mode == 'shell' or mode == 'shell-nohist':
-        return image_name or '{}-{}'.format(project, 'base')
-    return image_name or '{}-{}'.format(project, mode)
+def get_image_name(config, image):
+    if image in config.sections():
+        if 'name' in config[image]:
+            return f'{get_default_project_name()}-{config[image]["name"]}'
+    return f'{get_default_project_name()}-{image}'
 
 
-def get_image_tag(mode):
-    if mode == 'base' or mode == 'shell' or mode == 'shell-nohist':
-        return 'latest'
-    return os.getenv('IMAGE_TAG') or getpass.getuser()
+def get_image_tag(config, image):
+    if image in config.sections():
+        if 'tag' in config[image]:
+            return config[image]['tag']
+    return getpass.getuser()
 
 
-def get_image_types(synthetic_images=[]):
+def get_image_types(synthetic_images=None):
     docker_dir = os.path.join(get_root_dir(), 'docker')
-    return [x for x in os.listdir(docker_dir) if os.path.isdir(os.path.join(docker_dir, x))].append(synthetic_images)
-
-
-def get_default_image_name(mode):
-    return get_image_name(get_default_project_name(), mode)
-
+    if synthetic_images is None:
+        synthetic_images = []
+    return [x for x in os.listdir(docker_dir) if os.path.isdir(os.path.join(docker_dir, x))] + synthetic_images

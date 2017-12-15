@@ -3,6 +3,7 @@
 # Python script to build/clean containers associated for a project
 #
 import argparse
+import configparser
 import os
 import shlex
 import subprocess
@@ -15,24 +16,21 @@ def is_multistage(mode):
     return 'as builder' in open(f'docker/{mode}/Dockerfile').read()
 
 
-def build(project, mode, image_name, image_tag=None):
-    image_name = get_image_name(project, mode, image_name)
-    image_tag = image_tag or get_image_tag(mode)
-    rc = image_operation(f'docker build --compress -t {image_name}:{image_tag} -f docker/{mode}/Dockerfile .')
-    if not rc and is_multistage(mode):
+def build(image, image_name, image_tag):
+    rc = image_operation(f'docker build --compress -t {image_name}:{image_tag} -f docker/{image}/Dockerfile .')
+    if not rc and is_multistage(image):
         # if this is a multistage build and it follows the conventions, tag the builder image
         # otherwise, a prune will remove the layers used during the builder phase and subsequent
         # builds will take longer than required
-        image_operation(f'docker build --compress -t {image_name}-builder:{image_tag} -f docker/{mode}/Dockerfile --target builder .')
+        image_operation(
+            f'docker build --compress -t {image_name}-builder:{image_tag} -f docker/{image}/Dockerfile --target builder .')
     return rc
 
 
-def clean(project, mode, image_name, image_tag=None):
-    image_name = get_image_name(project, mode, image_name)
-    image_tag = image_tag or get_image_tag(mode)
+def clean(image, image_name, image_tag):
     rc = image_operation(f'docker rmi {image_name}:{image_tag}')
-    if is_multistage(mode):
-        image_operation(f'docker rmi {image_name}:{image_tag}-builder')
+    if is_multistage(image):
+        image_operation(f'docker rmi {image_name}-builder:{image_tag}')
     return rc
 
 
@@ -44,6 +42,9 @@ def image_operation(operation):
 
 if __name__ == '__main__':
     with cd(get_root_dir()):
+        config = configparser.ConfigParser()
+        config.read(os.path.join('docker', 'run.cfg'))
+
         gen_version_file()
 
         with pip_conf(get_root_dir()):
@@ -51,8 +52,6 @@ if __name__ == '__main__':
 
             parser = argparse.ArgumentParser()
             parser.add_argument("image", choices=['all', 'clean'] + image_types, help="image to build")
-            parser.add_argument("-i", "--image_name", help="Image name to build")
-            parser.add_argument("-t", "--image_tag", help="Image tag")
             parser.add_argument("-f", "--force_build_base", help="Build the base along with the requested image",
                                 action='store_true')
             args = parser.parse_args()
@@ -70,10 +69,10 @@ if __name__ == '__main__':
                     images_to_build.append('base')
                 images_to_build.append(args.image)
 
-            project_name = get_default_project_name()
-
             for image in images_to_build:
-                rc = fn(project_name, image, args.image_name, args.image_tag)
+                image_name = get_image_name(config, image)
+                image_tag = get_image_tag(config, image)
+                rc = fn(image, image_name, image_tag)
                 # because an image may not be present on the clean, ignore a non-zero return code
                 if rc and not args.image == 'clean':
                     sys.exit(rc)
