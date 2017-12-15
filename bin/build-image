@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+
+# Python script to build/clean containers associated for a project
+#
+import argparse
+import os
+import shlex
+import subprocess
+import sys
+
+from dockerutils import *
+
+
+def is_multistage(mode):
+    return 'as builder' in open(f'docker/{mode}/Dockerfile').read()
+
+
+def build(project, mode, image_name, image_tag=None):
+    image_name = get_image_name(project, mode, image_name)
+    image_tag = image_tag or get_image_tag(mode)
+    rc = image_operation(f'docker build --compress -t {image_name}:{image_tag} -f docker/{mode}/Dockerfile .')
+    if not rc and is_multistage(mode):
+        # if this is a multistage build and it follows the conventions, tag the builder image
+        # otherwise, a prune will remove the layers used during the builder phase and subsequent
+        # builds will take longer than required
+        image_operation(f'docker build --compress -t {image_name}-builder:{image_tag} -f docker/{mode}/Dockerfile --target builder .')
+    return rc
+
+
+def clean(project, mode, image_name, image_tag=None):
+    image_name = get_image_name(project, mode, image_name)
+    image_tag = image_tag or get_image_tag(mode)
+    rc = image_operation(f'docker rmi {image_name}:{image_tag}')
+    if is_multistage(mode):
+        image_operation(f'docker rmi {image_name}:{image_tag}-builder')
+    return rc
+
+
+def image_operation(operation):
+    print('\n\n============================================================================')
+    print('{}\n\n'.format(operation))
+    return subprocess.call(shlex.split(operation), cwd=os.getcwd())
+
+
+if __name__ == '__main__':
+    with cd(get_root_dir()):
+        gen_version_file()
+
+        with pip_conf(get_root_dir()):
+            image_types = get_image_types()
+
+            parser = argparse.ArgumentParser()
+            parser.add_argument("image", choices=['all', 'clean'] + image_types, help="image to build")
+            parser.add_argument("-i", "--image_name", help="Image name to build")
+            parser.add_argument("-t", "--image_tag", help="Image tag")
+            parser.add_argument("-f", "--force_build_base", help="Build the base along with the requested image",
+                                action='store_true')
+            args = parser.parse_args()
+
+            images_to_build = []
+            fn = build
+            if args.image == 'all':
+                images_to_build = image_types
+            elif args.image == 'clean':
+                images_to_build = image_types
+                fn = clean
+            else:
+                images_to_build = []
+                if not args.image == 'base' and args.force_build_base and 'base' in image_types:
+                    images_to_build.append('base')
+                images_to_build.append(args.image)
+
+            project_name = get_default_project_name()
+
+            for image in images_to_build:
+                rc = fn(project_name, image, args.image_name, args.image_tag)
+                # because an image may not be present on the clean, ignore a non-zero return code
+                if rc and not args.image == 'clean':
+                    sys.exit(rc)
+    sys.exit(0)

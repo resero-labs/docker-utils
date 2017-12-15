@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+
+# Python script to run containers associated with a project
+#
+import argparse
+import configparser
+import datetime
+import getpass
+import json
+import os
+import shlex
+import subprocess
+import sys
+import urllib.parse
+import urllib.request
+
+from dockerutils import *
+
+_base_cmd = 'docker run --name {name} {environment} {keep_container} {interactive} {gpu} {network} ' \
+            '{volumes} {ports} {image_name}:{image_tag} {cmd}'
+
+def fetch_env_variables(config):
+    env_vars = {}
+    if 'env_var_names' in config.sections():
+        endpoint = f"http://{os.environ.get(config['env_var_names']['remote_ip'])}:" \
+                   f"{os.environ.get(config['env_var_names']['remote_port'], '5000')}/config"
+        try:
+            with urllib.request.urlopen(endpoint, timeout=1) as response_f:
+                response = json.load(response_f)
+                env_vars = response.get('env_variables') or {}
+        except urllib.error.URLError:
+            pass
+    return ' '.join([f'-e {key}={value}' for key, value in env_vars.items()])
+
+
+def run(project, mode, image_name, **kwargs):
+    user = getpass.getuser()
+    volumes = kwargs['volumes'].format(root=get_root_dir(), user=user)
+    if kwargs['network']:
+        kwargs['network'] = f"--network {kwargs['network']}"
+
+    timestamp = datetime.datetime.now().strftime("%y-%m-%d_%H.%M.%S")
+    cmd = _base_cmd.format(image_name=get_image_name(project, mode, image_name),
+                           image_tag=get_image_tag(mode),
+                           name=f"{getpass.getuser()}_{mode}_{timestamp}",
+                           keep_container=kwargs['keep_container'],
+                           interactive=kwargs['interactive'],
+                           environment=kwargs['environment'],
+                           network=f"--network {kwargs['network']}",
+                           ports=kwargs['ports'],
+                           volumes=volumes,
+                           gpu=kwargs['gpu'],
+                           cmd=kwargs['cmd'])
+    print('\n\n============================================================================')
+    print('{}\n\n'.format(cmd))
+    return subprocess.call(shlex.split(cmd), cwd=os.getcwd())
+
+
+if __name__ == '__main__':
+    with cd(get_root_dir()):
+        config = configparser.ConfigParser()
+        config.read(os.path.join('docker', 'run.cfg'))
+
+        if 'synthetic_images' in config['run_image']:
+            image_types = get_image_types(config['run_image']['syntetic_images'].split(','))
+        else:
+            image_types = get_image_types()
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("image", choices=image_types, help="Docker image to run")
+        parser.add_argument("-k", "--keep", help="keep the image after execution", action='store_true')
+        parser.add_argument("-i", "--image_name", help="Image naming override")
+        parser.add_argument("-c", "--command", help="Command for image override")
+        parser.add_argument("-n", "--network", help="Network for image override", default='')
+        parser.add_argument("-g", "--use-gpu", dest='use_gpu', default=False, action='store_true',
+                            help="Start the container with gpu support")
+        args = parser.parse_args()
+
+        if args.use_gpu:
+            gpu = '--runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -e CPU_GPU_ENV=/gpu-env'
+        else:
+            gpu = ''
+
+        run_config = {
+            'environment': fetch_env_variables(config),
+            'keep_container': args.keep or '--rm',
+            'interactive': '-d' if args.keep else '-it',
+            'gpu': gpu,
+            'network': args.network or '',
+            'volumes': '',
+            'ports': '',
+            'cmd': args.command or ''
+        }
+        if args.image in config.sections():
+            for key in run_config.keys():
+                if not run_config[key] and key in config[args.image]:
+                    run_config[key] = config[args.image][key]
+
+        sys.exit(run(get_default_project_name(), args.image, args.image_name, **run_config))
