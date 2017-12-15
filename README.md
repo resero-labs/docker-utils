@@ -12,3 +12,4 @@ Conventions:
     * root
     * workdir
 8) Environment Variable Conventions
+9) Support for versioneer
