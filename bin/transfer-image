@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+# transfers an image from local docker to docker running on a server
+SSH_KEY_INCLUDE=
+if [ ! -z "$SSH_KEY" ]; then
+  SSH_KEY_INCLUDE="-i $SSH_KEY"
+fi
+
+if [ $# -ne 2 ]; then
+  echo "usage"
+  echo "$ transfer-image <image-name> <destination-host>"
+  exit 1
+fi
+
+
+function transfer_verbose() {
+  local image_name=$1
+  local remote_ip=$2
+
+  local temp_file=$(mktemp)
+
+  echo "Storing the image to $temp_file"
+  docker save $image_name | gzip > $temp_file
+  if [ $? -ne 0 ]; then
+    echo "Failed to save image $image_name"
+    rm -rf $temp_file
+    exit 1
+  fi
+
+  echo "Copying over the image to $remote_ip"
+  scp $SSH_KEY_INCLUDE $temp_file $remote_ip:image.tar.gz
+  local result=$?
+
+  rm -rf $temp_file
+  if [ $result -ne 0 ]; then
+    echo "Failed to scp image file over"
+    exit 1
+  fi
+
+  echo "Loading the image on $remote_ip"
+  ssh $SSH_KEY_INCLUDE $remote_ip 'cat image.tar.gz | gunzip | sudo docker load'
+  if [ $? -ne 0 ]; then
+    echo "Failed to load image on $remote_ip, manually delete image.tar.gz"
+    exit 2
+  fi
+
+  ssh $SSH_KEY_INCLUDE $remote_ip 'rm image.tar.gz'
+}
+
+function transfer() {
+    if ! [ -x "$(command -v pv)" ]; then
+        transfer_verbose $1 $2
+    else
+        docker save $1 | gzip | pv | ssh $SSH_KEY_INCLUDE $2 'gunzip | sudo docker load'
+    fi
+}
+
+transfer $1 $2
