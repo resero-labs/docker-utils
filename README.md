@@ -8,7 +8,7 @@ For instance:
 * cases in which you want to "freeze" any external dependencies in one container and use that as a base
 for containers that are dependent solely on the project
 
-This utility provide an opinionated way of accomplishing this. These utilities were built with
+These utilities/patterns provide an opinionated way of accomplishing this. These utilities were built with
 a python project in mind, but the concepts extend to other project types.
 
 # Conventions
@@ -44,7 +44,7 @@ container
 # CLI
 
 `build-image` takes the name of one of the sub-directories in the `docker` directory and builds the
-image defined therein. The image is named <project>-<subdir>:<user>
+image defined therein. The image is named \<project\>-\<subdir\>:\<user\>
 
 `run-image` takes the name of one of the sub-directories (or one of the synthetic images defined in `run.cfg`), 
 together with any of the configuration for that image defined in `run.cfg` and starts a docker container
