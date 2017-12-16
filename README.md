@@ -54,6 +54,7 @@ together with any of the configuration for that image defined in `run.cfg` and s
 `publish-image` takes a docker image name and uploads it to the docker repository configured in the host envionrment
 
 # `run.cfg` Format
+Configuration in `docker/run.cfg` is used to customize behavior of the `build-image` and `run-image` CLI.
 
 ## Image Section
 The `run.cfg` file format allows for configuration sections named corresponding to the sub-directories in the 
@@ -140,3 +141,14 @@ Docker image. An example of this is found in the cicd sub-directory.
 ## `.dockerignore`
 In order to minimize the context sent to Docker to build images, please see examples in `.dockerignore` in this
 repository.
+
+# A Note on Implementation
+I selected to use the Docker command line from python scripts rather than the [Docker
+API available to Python](https://pypi.python.org/pypi/docker/) as it integrates better into my development loop. As each CLI prints 
+the Docker command it's using, if it does something unexpected, it's each to copy and paste
+the command used, modify it and be on your way without having to debug through CLI utility code, 
+allowing bugs/additions to the CLI to be addressed at a later point outside the context of a
+project development loop.
+
+# Todo:
+1) Prep for [pypi](https://wiki.python.org/moin/CheeseShopTutorial#Submitting_Packages_to_the_Package_Index)
