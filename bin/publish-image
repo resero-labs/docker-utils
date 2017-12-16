@@ -6,7 +6,7 @@ if [ "$IMAGE_NAME" == "" -a "$#" -ne 1 ]
 then
     echo ""
     echo "ERROR: Either IMAGE_NAME must be defined, or the mode must be provided as a single argument. e.g."
-    echo "    publish-image lanista"
+    echo "    publish-image prod"
     echo ""
     exit 1
 fi

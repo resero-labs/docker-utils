@@ -1,0 +1,17 @@
+# this file is for illustrative purposes
+# exclude .git from the Docker context
+.git
+# exclude an python virtual environments (usually .env or .venv directory)
+.*env
+# exclude any IDE files/directories (I happen to use PyCharm, so...)
+.idea
+.project
+.pydevproject
+# exclude files that could mismatch the environment in container
+*.pyc
+**/__pycache__
+# exclude files that could be artifacts of setuptools in the host environment
+build
+dist
+*.egg-info
+.cache

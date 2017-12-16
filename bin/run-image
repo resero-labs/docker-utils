@@ -20,6 +20,7 @@ _base_cmd = 'docker run --name {name} {environment} {keep_container} {interactiv
             '{volumes} {ports} {image_name}:{image_tag} {cmd}'
 
 def fetch_env_variables(config):
+    # a special use case. retrieve env variables from a config server.
     env_vars = {}
     if 'env_var_names' in config.sections():
         endpoint = f"http://{os.environ.get(config['env_var_names']['remote_ip'])}:" \
@@ -35,7 +36,7 @@ def fetch_env_variables(config):
 
 def run(mode, image_name, image_tag, **kwargs):
     user = getpass.getuser()
-    volumes = kwargs['volumes'].format(root=get_root_dir(), user=user)
+    volumes = kwargs['volumes'].format(project_root=get_root_dir(), user=user)
     if kwargs['network']:
         kwargs['network'] = f"--network {kwargs['network']}"
 
