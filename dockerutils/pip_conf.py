@@ -16,7 +16,7 @@ class pip_conf:
                 self.pip_copied = True
                 copy2(pip_conf_template, self.pip_conf)
             else:
-                print('No pip.conf found, will not pull packages from corp package manager')
+                print('No pip.conf found, will not pull packages from custom package manager')
 
     def __exit__(self, etype, value, traceback):
         if self.pip_copied:
