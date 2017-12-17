@@ -62,7 +62,7 @@ if __name__ == '__main__':
         config = configparser.ConfigParser()
         config.read(os.path.join('docker', 'run.cfg'))
 
-        if 'synthetic_images' in config['run_image']:
+        if 'run_image' in config and 'synthetic_images' in config['run_image']:
             image_types = get_image_types(config['run_image']['synthetic_images'].split(','))
         else:
             image_types = get_image_types()

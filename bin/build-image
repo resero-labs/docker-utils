@@ -17,13 +17,16 @@ def is_multistage(mode):
 
 
 def build(image, image_name, image_tag):
-    rc = image_operation(f'docker build --compress -t {image_name}:{image_tag} -f docker/{image}/Dockerfile .')
-    if not rc and is_multistage(image):
+    rc = 0
+    if is_multistage(image):
         # if this is a multistage build and it follows the conventions, tag the builder image
         # otherwise, a prune will remove the layers used during the builder phase and subsequent
         # builds will take longer than required
-        image_operation(
-            f'docker build --compress -t {image_name}-builder:{image_tag} -f docker/{image}/Dockerfile --target builder .')
+        rc = image_operation(f'docker build --compress -t {image_name}-builder:{image_tag} '
+                             f'-f docker/{image}/Dockerfile --target builder .')
+    if not rc:
+        rc = image_operation(f'docker build --compress -t {image_name}:{image_tag} '
+                             f'-f docker/{image}/Dockerfile .')
     return rc
 
 
@@ -36,7 +39,7 @@ def clean(image, image_name, image_tag):
 
 def image_operation(operation):
     print('\n\n============================================================================')
-    print('{}\n\n'.format(operation))
+    print(f'{operation}\n\n')
     return subprocess.call(shlex.split(operation), cwd=os.getcwd())
 
 

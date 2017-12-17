@@ -123,9 +123,22 @@ image that is built in an environment that is open, use `transfer-image` to send
 then utilize a derived image dependent just on project sources and the base image to iterate without requiring open
 access on the server.
  
-## Adding test frameworks, code analysis tools, etc. to a container for testing validation
+## Adding test frameworks, code analysis tools, etc. to a container for testing/validation
 
 ## Tensorflow for both CPU and GPU in the same container
+It is sometimes useful to try both the CPU and GPU versions of Tensorflow. The example in `docker/tensorflow` provides
+a pattern to do so. All tensorflow depdendencies are installed into global python site-packages. Then virtual 
+environments are created for both cpu and gpu versions and the appropriate version of tensorflow is install into 
+the respective virtual environments.
+
+The `run-image` script makes use of NVIDIA Docker 2.0 being installed on the host os. When run with the `-g` option,
+the NVIDIA runtime will be used to make GPUs available in container.
+
+Upon container startup, the appropriate virtual environment (cpu or gpu) will be activated dependant upon the 
+`-g` option.
+
+To switch between virtual envrionments utilized the symbolic links, `/cpu-env` and `/gpu-env`, e.g. 
+`source /cpu-env`.
 
 ## Multistage Docker builds
      
