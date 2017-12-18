@@ -46,7 +46,7 @@ def image_operation(operation):
 if __name__ == '__main__':
     with cd(get_root_dir()):
         config = configparser.ConfigParser()
-        config.read(os.path.join('docker', 'run.cfg'))
+        config.read(os.path.join('docker', 'dockerutils.cfg'))
 
         gen_version_file()
 

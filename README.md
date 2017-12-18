@@ -36,7 +36,7 @@ container
     Subsequent images can be built based of that image that are "self-contained" (relying only on source
     from the project). The remote docker api can then be used to quickly iterate only requiring the more
     cumbersome transfer-image to be used when external dependencies change.
-5) Building and running images controlled through configuration (<project_dir>/docker/run.cfg)
+5) Building and running images controlled through configuration (<project_dir>/docker/dockerutils.cfg)
 
     Includes setting most docker parameters, i.e. volume mounts, ports, networks, commands, etc. with
     replacement varilable support for things like user, project root, etc.
@@ -46,18 +46,18 @@ container
 `build-image` takes the name of one of the sub-directories in the `docker` directory and builds the
 image defined therein. The image is named \<project\>-\<subdir\>:\<user\>
 
-`run-image` takes the name of one of the sub-directories (or one of the synthetic images defined in `run.cfg`), 
-together with any of the configuration for that image defined in `run.cfg` and starts a docker container
+`run-image` takes the name of one of the sub-directories (or one of the synthetic images defined in `dockerutils.cfg`), 
+together with any of the configuration for that image defined in `dockerutils.cfg` and starts a docker container
 
 `transfer-image` takes a docker image name and used docker `save` and `load` to transfer the image to a remote host
 
 `publish-image` takes a docker image name and uploads it to the docker repository configured in the host envionrment
 
-# `run.cfg` Format
-Configuration in `docker/run.cfg` is used to customize behavior of the `build-image` and `run-image` CLI.
+# `dockerutils.cfg` Format
+Configuration in `docker/dockerutils.cfg` is used to customize behavior of the `build-image` and `run-image` CLI.
 
 ## Image Section
-The `run.cfg` file format allows for configuration sections named corresponding to the sub-directories in the 
+The `dockerutils.cfg` file format allows for configuration sections named corresponding to the sub-directories in the 
 docker directory tree. Each of these sections may contain one of the following:
 
 * `environment` - in the form of (`-e VAR=value`)+ to pass environment into the container
@@ -111,7 +111,7 @@ The `dev` example does a reasonable job of doing just this.
 With this pattern, you create a `Dockerfile` that has everything in the image *except* for your project source. An
 empty `WORKDIR` is created and then `ENTRYPOINT` even does a `pip install -e` of the contents of the empty `WORKDIR`. 
 We get the desired results by mounting the source project directory into the container's `WORKDIR` (see `dev` section
-of `docker/run.cfg`).
+of `docker/dockertuils.cfg`).
 
 With this pattern you can run tests, experiment, etc. in container, make changes to the project in your host 
 environment toolset and immediately observe the changes that were made.
