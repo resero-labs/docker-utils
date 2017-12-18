@@ -73,8 +73,7 @@ if __name__ == '__main__':
                 images_to_build.append(args.image)
 
             for image in images_to_build:
-                image_name = get_image_name(config, image)
-                image_tag = get_image_tag(config, image)
+                image_name, image_tag = get_image_designation(image, config)
                 rc = fn(image, image_name, image_tag)
                 # because an image may not be present on the clean, ignore a non-zero return code
                 if rc and not args.image == 'clean':

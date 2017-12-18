@@ -96,7 +96,6 @@ if __name__ == '__main__':
                 if not run_config[key] and key in config[args.image]:
                     run_config[key] = config[args.image][key]
 
-        image_name = get_image_name(config, args.image)
-        image_tag = get_image_tag(config, args.image)
+        image_name, image_tag = get_image_designation(args.image, config)
 
         sys.exit(run(args.image, image_name, image_tag, **run_config))

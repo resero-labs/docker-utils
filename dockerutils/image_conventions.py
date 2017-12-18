@@ -1,3 +1,4 @@
+import configparser
 import logging
 import os
 import getpass
@@ -29,6 +30,14 @@ def get_root_dir():
 
 def get_default_project_name():
     return os.path.basename(get_root_dir()).lower()
+
+
+def get_image_designation(image, config=None):
+    if not config:
+        os.path.join(get_root_dir(), os.path.join('docker', 'dockerutils.cfg'))
+        config = configparser.ConfigParser()
+        config.read(os.path.join(get_root_dir(), os.path.join('docker', 'dockerutils.cfg')))
+    return (get_image_name(config, image), get_image_tag(config, image))
 
 
 def get_image_name(config, image):
