@@ -53,7 +53,7 @@ def run(mode, image_name, image_tag, **kwargs):
                            gpu=kwargs['gpu'],
                            cmd=kwargs['cmd'])
     print('\n\n============================================================================')
-    print('{}\n\n'.format(cmd))
+    print(f'{cmd}\n\n')
     return subprocess.call(shlex.split(cmd), cwd=os.getcwd())
 
 
