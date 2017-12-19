@@ -29,6 +29,7 @@ setup_options = dict(
              'bin/run-image', 'bin/genversion', 'bin/transfer-image'],
     packages=find_packages(exclude=['tests*']),
     license="MIT License",
+    python_requires='>=3.6',
     classifiers=(
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',

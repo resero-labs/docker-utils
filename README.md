@@ -162,6 +162,3 @@ the Docker command it's using, if it does something unexpected, it's each to cop
 the command used, modify it and be on your way without having to debug through CLI utility code, 
 allowing bugs/additions to the CLI to be addressed at a later point outside the context of a
 project development loop.
-
-# Todo:
-1) Prep for [pypi](https://wiki.python.org/moin/CheeseShopTutorial#Submitting_Packages_to_the_Package_Index)
