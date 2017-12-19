@@ -17,7 +17,7 @@ A project that desires to make use of this utility should/can:
 1) Create a docker directory tree at the root of the project
 
     In this directory tree there should be one sub-directory for each unique docker container type that is desired.
-    Each of these directories would contain the `Dockerfile` that will be used to create the image
+    Each of these sub-directories would contain the `Dockerfile` that will be used to create the image
     as well as any source specific to that image.
 2) Use versioneer for project versioning. 
 
