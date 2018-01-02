@@ -2,6 +2,7 @@ import configparser
 import logging
 import os
 import getpass
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ def get_root_dir():
             _ROOT_DIR = os.getcwd()
         else:
             logger.warning('Unable to find docker directory. Invalid root: ' + os.getcwd())
+            sys.exit(1)
 
     return _ROOT_DIR
 
