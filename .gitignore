@@ -5,3 +5,4 @@ __pycache__
 _version.py.bld
 *.whl
 dist
+_testing_output/

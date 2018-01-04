@@ -37,6 +37,16 @@ setup_options = dict(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.6',
     ),
+    extras_require={
+        'dev': [
+            'wheel>=0.29'
+        ],
+        'test': [
+            'pytest>=3.0,<4',
+            'pytest-cov>=2.4,<3',
+            'pylint>=1.8.1'
+        ],
+    },
 )
 
 setup(**setup_options)
