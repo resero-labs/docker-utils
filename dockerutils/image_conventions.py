@@ -1,3 +1,4 @@
+"""Functions that enforce conventions surrounding docker images."""
 import configparser
 import logging
 import os
@@ -9,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 _ROOT_DIR = None
 def get_root_dir():
-    global _ROOT_DIR
     '''
     get_root_dir will return the root directory of the project that contains a docker file.
      The constraints for our project with regard to docker are that there id a docker directoy as
@@ -18,6 +18,7 @@ def get_root_dir():
      various docker files that will be build (e.g. dev, lanista, jenkins, etc.)
     :return: root_directory for docker builda
     '''
+    global _ROOT_DIR # pylint: disable=global-statement
 
     if _ROOT_DIR is None:
         docker_dir = os.path.join(os.getcwd(), 'docker')

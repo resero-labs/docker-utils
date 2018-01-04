@@ -1,3 +1,6 @@
+"""
+A collection of utility functions and classes used by the xxx-image scripts
+"""
 from .cd import cd
 from .pip_conf import pip_conf
 from .image_conventions import get_root_dir, get_image_types, get_image_designation
