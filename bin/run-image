@@ -16,7 +16,7 @@ import urllib.request
 
 from dockerutils import *
 
-_base_cmd = 'docker run --name {name} {environment} {keep_container} {interactive} {gpu} {network} ' \
+_base_cmd = 'docker run {init} --name {name} {environment} {keep_container} {interactive} {gpu} {network} ' \
             '{volumes} {ports} {image_name}:{image_tag} {cmd}'
 
 def fetch_env_variables(config):
@@ -51,7 +51,8 @@ def run(mode, image_name, image_tag, **kwargs):
                            ports=kwargs['ports'],
                            volumes=volumes,
                            gpu=kwargs['gpu'],
-                           cmd=kwargs['cmd'])
+                           cmd=kwargs['cmd'],
+                           init=kwargs['init'])
     print('\n\n============================================================================')
     print(f'{cmd}\n\n')
     return subprocess.call(shlex.split(cmd), cwd=os.getcwd())
@@ -74,12 +75,18 @@ if __name__ == '__main__':
         parser.add_argument("-n", "--network", help="Network for image override", default='')
         parser.add_argument("-g", "--use-gpu", dest='use_gpu', default=False, action='store_true',
                             help="Start the container with gpu support")
+        parser.add_argument("-p", "--pre", default=False, action='store_true',
+                            help="use pre 1.25 API")
         args = parser.parse_args()
 
         if args.use_gpu:
             gpu = '--runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -e CPU_GPU_ENV=/gpu-env'
         else:
             gpu = ''
+        if args.pre:
+            init = ''
+        else:
+            init = '--init'
 
         run_config = {
             'environment': fetch_env_variables(config),
@@ -89,7 +96,8 @@ if __name__ == '__main__':
             'network': args.network or '',
             'volumes': '',
             'ports': '',
-            'cmd': args.command or ''
+            'cmd': args.command or '',
+            'init': init
         }
         if args.image in config.sections():
             for key in run_config.keys():
