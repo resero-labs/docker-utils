@@ -26,7 +26,7 @@ setup_options = dict(
     author='Daniel Rapp',
     url='https://github.com/rappdw/docker-utils.git',
     scripts=['bin/build-image', 'bin/publish-image',
-             'bin/run-image', 'bin/genversion', 'bin/transfer-image', 'bin/venv'],
+             'bin/run-image', 'bin/genversion', 'bin/transfer-image'],
     packages=find_packages(exclude=['tests*']),
     license="MIT License",
     python_requires='>=3.6',
