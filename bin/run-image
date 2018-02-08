@@ -19,7 +19,7 @@ from dockerutils import *
 _base_cmd = 'docker run {init} --name {name} {environment} {keep_container} {interactive} {gpu} {network} ' \
             '{volumes} {ports} {image_name}:{image_tag} {cmd}'
 
-def fetch_env_variables(config):
+def fetch_env_variables(config, image):
     # a special use case. retrieve env variables from a config server.
     env_vars = {}
     if 'env_var_names' in config.sections():
@@ -31,6 +31,10 @@ def fetch_env_variables(config):
                 env_vars = response.get('env_variables') or {}
         except urllib.error.URLError:
             pass
+    if 'env' in config[image]:
+        env_section = config[image]['env']
+        for vars in config[env_section]:
+            env_vars[vars] = config[env_section][vars]
     return ' '.join([f'-e {key}={value}' for key, value in env_vars.items()])
 
 
@@ -61,6 +65,7 @@ def run(mode, image_name, image_tag, **kwargs):
 if __name__ == '__main__':
     with cd(get_root_dir()):
         config = configparser.ConfigParser()
+        config.optionxform = str
         config.read(os.path.join('docker', 'dockerutils.cfg'))
 
         if 'run_image' in config and 'synthetic_images' in config['run_image']:
@@ -89,7 +94,7 @@ if __name__ == '__main__':
             init = '--init'
 
         run_config = {
-            'environment': fetch_env_variables(config),
+            'environment': fetch_env_variables(config, args.image),
             'keep_container': args.keep or '--rm',
             'interactive': '-d' if args.keep else '-it',
             'gpu': gpu,
