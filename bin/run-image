@@ -31,7 +31,7 @@ def fetch_env_variables(config, image):
                 env_vars = response.get('env_variables') or {}
         except urllib.error.URLError:
             pass
-    if 'env' in config[image]:
+    if image in config and 'env' in config[image]:
         env_section = config[image]['env']
         for vars in config[env_section]:
             env_vars[vars] = config[env_section][vars]
