@@ -40,7 +40,11 @@ def fetch_env_variables(config, image):
 
 def run(mode, image_name, image_tag, **kwargs):
     user = getpass.getuser()
-    volumes = kwargs['volumes'].format(project_root=get_root_dir(), user=user)
+    volumes = kwargs['volumes'].format(
+        project_root=get_root_dir(),
+        user=user,
+        project=os.path.split(get_root_dir())[1]
+    )
     if kwargs['network']:
         kwargs['network'] = f"--network {kwargs['network']}"
 
