@@ -58,6 +58,8 @@ if __name__ == '__main__':
             parser.add_argument("image", choices=['all', 'clean'] + image_types, help="image to build")
             parser.add_argument("-f", "--force_build_base", help="Build the base along with the requested image",
                                 action='store_true')
+            parser.add_argument("-i", "--image_name", help="use this image name rather than the default")
+            parser.add_argument("-t", "--image_tag", help="use this image tag rather than the default")
             args = parser.parse_args()
 
             images_to_build = []
@@ -75,6 +77,10 @@ if __name__ == '__main__':
 
             for image in images_to_build:
                 image_name, image_tag = get_image_designation(image, config)
+                if args.image_name:
+                    image_name = args.image_name
+                if args.image_tag:
+                    image_tag = args.image_tag
                 rc = fn(image, image_name, image_tag)
                 # because an image may not be present on the clean, ignore a non-zero return code
                 if rc and not args.image == 'clean':
