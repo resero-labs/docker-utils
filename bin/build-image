@@ -85,7 +85,7 @@ if __name__ == '__main__':
                     image_name = args.image_name
                 if args.image_tag:
                     image_tag = args.image_tag
-                rc = fn(image, image_name, image_tag, args.pull_base)
+                rc = fn(image, image_name, image_tag, args.pull_base or args.force_build_base)
                 # because an image may not be present on the clean, ignore a non-zero return code
                 if rc and not args.image == 'clean':
                     sys.exit(rc)
