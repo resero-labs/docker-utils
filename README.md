@@ -68,6 +68,7 @@ docker directory tree. Each of these sections may contain one of the following:
 * `volumes` - in the form of (`-v <host-dir>:<container-dir>`)+ or (`--mount ...`)+ or both
 * `ports` - in the form of (`-p <host-port>:<container-port>`)+
 * `cmd` - any valid Docker `CMD` specification
+* `pull_FROM_on_force` - defaults to False, if True, add --pull to build command when force building image (or base image)
 
 ## Synthetic Images
 Additionally, "synthetic" images can be specified by adding a `run-image` section with a `synthetic_images` definition
@@ -96,8 +97,9 @@ tag=experiment.2017.12.16
 The volume specification may contain replacement variable designations of the form `{var}`. The supported variables
 include:
 
-* `project-name` - will be replaced with the root directory name of the project
+* `project_root` - will be replaced with the root directory name of the project
 * `user` - will be replaced with the user name of the user running the command
+* `project` - replace with project namge 
 
 # Patterns
 
