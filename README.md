@@ -52,7 +52,7 @@ together with any of the configuration for that image defined in `dockerutils.cf
 `transfer-image` takes a docker image name and used docker `save` and `load` to transfer the image to a remote host
 
 `publish-image` takes the name of one of the sub-directories in the `docker` directory and pushes the image built by 
-the docker file to the defined repository (AWS or Docker)
+the docker file to the defined repository (AWS or Docker) 
 
 # `dockerutils.cfg` Format
 Configuration in `docker/dockerutils.cfg` is used to customize behavior of the `build-image` and `run-image` CLI.
@@ -110,6 +110,15 @@ include:
 * `image` - Image name
 * `tag` - Image tag 
 * `user` - will be replaced with the user name of the user running the command
+
+## Publish to AWS
+In order to publish to AWS, the repository will be the image name and the following should
+be configured for images that are published to AWS
+
+```
+image_repo=aws
+publication_tag={account}.dkr.ecr.{region}.amazonaws.com/{image}:{tag}"
+```
 
 # Patterns
 

@@ -7,6 +7,7 @@ import os
 import shlex
 import subprocess
 import sys
+import traceback
 
 import boto3
 
@@ -28,6 +29,15 @@ def docker_tag(image_name, image_tag, publication_tag):
 def docker_push(publication_tag):
     return run(f'docker push {publication_tag}')
 
+def aws_create_repo_if_necessary(ecr_client, image_name):
+    try:
+        ecr_client.create_repository(repositoryName=image_name)
+    except ecr_client.exceptions.RepositoryAlreadyExistsException:
+        pass
+    except Exception:
+        traceback.print_exc()
+        return -1
+    return 0
 
 def run(cmd: str):
     print('\n\n============================================================================')
@@ -77,11 +87,14 @@ if __name__ == '__main__':
                 tag=image_tag,
                 user=getpass.getuser()
             )
-            auth_data = boto3.client('ecr').get_authorization_token()
+            ecr_client = boto3.client('ecr')
+            auth_data = ecr_client.get_authorization_token()
             user, password = base64.b64decode(auth_data['authorizationData'][0]['authorizationToken']).decode().split(
                 ':')
             endpoint = auth_data['authorizationData'][0]['proxyEndpoint']
             rc = docker_login_aws(user, password, endpoint)
+            if rc == 0:
+                aws_create_repo_if_necessary(ecr_client, image_name)
         else:
             publication_tag = push_config['publication_tag'].format(
                 account='',
