@@ -51,7 +51,8 @@ together with any of the configuration for that image defined in `dockerutils.cf
 
 `transfer-image` takes a docker image name and used docker `save` and `load` to transfer the image to a remote host
 
-`publish-image` takes a docker image name and uploads it to the docker repository configured in the host envionrment
+`publish-image` takes the name of one of the sub-directories in the `docker` directory and pushes the image built by 
+the docker file to the defined repository (AWS or Docker)
 
 # `dockerutils.cfg` Format
 Configuration in `docker/dockerutils.cfg` is used to customize behavior of the `build-image` and `run-image` CLI.
@@ -69,6 +70,8 @@ docker directory tree. Each of these sections may contain one of the following:
 * `ports` - in the form of (`-p <host-port>:<container-port>`)+
 * `cmd` - any valid Docker `CMD` specification
 * `pull_FROM_on_force` - defaults to False, if True, add --pull to build command when force building image (or base image)
+* `image_repo` - the repository to publish the image to
+* `publication_tag` - the tag for publication (full image name + tag) 
 
 ## Synthetic Images
 Additionally, "synthetic" images can be specified by adding a `run-image` section with a `synthetic_images` definition
@@ -99,7 +102,14 @@ include:
 
 * `project_root` - will be replaced with the root directory name of the project
 * `user` - will be replaced with the user name of the user running the command
-* `project` - replace with project namge 
+* `project` - replace with project namge
+
+## Image Push Replacement Variables
+* `account` - AWS account designation
+* `region` - AWS region
+* `image` - Image name
+* `tag` - Image tag 
+* `user` - will be replaced with the user name of the user running the command
 
 # Patterns
 

@@ -7,3 +7,5 @@ _version.py.bld
 dist
 _testing_output/
 build
+activate
+

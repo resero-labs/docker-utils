@@ -37,6 +37,9 @@ setup_options = dict(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.6',
     ),
+    install_requires=[
+        'boto3'
+    ],
     extras_require={
         'dev': [
             'wheel>=0.29'

@@ -1,20 +1,100 @@
-#!/usr/bin/env bash
-# vim: filetype=sh:
+#!/usr/bin/env python3
+import argparse
+import base64
+import configparser
+import getpass
+import os
+import shlex
+import subprocess
+import sys
 
-IMAGE_NAME=${IMAGE_NAME}
-if [ "$IMAGE_NAME" == "" -a "$#" -ne 1 ]
-then
-    echo ""
-    echo "ERROR: Either IMAGE_NAME must be defined, or the mode must be provided as a single argument. e.g."
-    echo "    publish-image prod"
-    echo ""
-    exit 1
-fi
+import boto3
 
-BUILD_NUMBER=${BUILD_NUMBER:-$(python -c "import versioneer; print(versioneer.get_versions()['version'].replace('+', '-'))")}
-IMAGE_NAME=${IMAGE_NAME:-$(basename $(pwd))-$1}
+from dockerutils import *
 
-echo -e "Pushing the image: $IMAGE_NAME:$BUILD_NUMBER"
-docker tag $IMAGE_NAME $IMAGE_NAME:$BUILD_NUMBER
-docker push $IMAGE_NAME:$BUILD_NUMBER
 
+def docker_login_aws(user: str, password: str, endpoint: str):
+    return run(f'docker login -u {user} -p {password} {endpoint}')
+
+
+def docker_login_dockerhub():
+    return run('docker login docker.com')
+
+
+def docker_tag(image_name, image_tag, publication_tag):
+    return run(f'docker tag {image_name}:{image_tag} {publication_tag}')
+
+
+def docker_push(publication_tag):
+    return run(f'docker push {publication_tag}')
+
+
+def run(cmd: str):
+    print('\n\n============================================================================')
+    print(f'{cmd}\n\n')
+    return subprocess.call(shlex.split(cmd), cwd=os.getcwd())
+
+if __name__ == '__main__':
+    with cd(get_root_dir()):
+        config = configparser.ConfigParser()
+        config.optionxform = str
+        config.read(os.path.join('docker', 'dockerutils.cfg'))
+
+        image_types = get_image_types()
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("image", choices=image_types, help="image to publish")
+        parser.add_argument("-i", "--image_name", help="use this image name rather than the default")
+        args = parser.parse_args()
+
+        image_name, image_tag = get_image_designation(args.image, config)
+        if args.image_name:
+            image_name = args.image_name
+
+        push_config = {
+            'image_repo': '',  # one of ['aws', 'docker_hub']
+            'publication_tag': '',
+        }
+        if args.image in config.sections():
+            for key in push_config.keys():
+                if not push_config[key] and key in config[args.image]:
+                    push_config[key] = config[args.image][key]
+
+        image_name, image_tag = get_image_designation(args.image, config)
+
+        if not push_config['image_repo']:
+            push_config['image_repo'] = 'docker'
+        if not push_config['image_repo'] in ['aws', 'docker_hub']:
+            print("Invalid publication target. Currently only supports 'aws' and 'docker_hub'")
+            sys.exit(-1)
+
+        if push_config['image_repo'] == 'aws':
+            region = boto3.session.Session().region_name
+            publication_tag = push_config['publication_tag'].format(
+                account=boto3.client('sts').get_caller_identity()['Account'],
+                region=region,
+                image=image_name,
+                tag=image_tag,
+                user=getpass.getuser()
+            )
+            auth_data = boto3.client('ecr').get_authorization_token()
+            user, password = base64.b64decode(auth_data['authorizationData'][0]['authorizationToken']).decode().split(
+                ':')
+            endpoint = auth_data['authorizationData'][0]['proxyEndpoint']
+            rc = docker_login_aws(user, password, endpoint)
+        else:
+            publication_tag = push_config['publication_tag'].format(
+                account='',
+                region='',
+                image=image_name,
+                tag=image_tag,
+                user=getpass.getuser()
+            )
+            # TODO: should we pick up user and password for docker.com? Maybe via credstash?
+            rc = docker_login_dockerhub()
+
+        if rc == 0:
+            rc = docker_tag(image_name, image_tag, publication_tag)
+        if rc == 0:
+            rc = docker_push(publication_tag)
+    sys.exit(rc)
