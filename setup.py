@@ -23,6 +23,7 @@ setup_options = dict(
     version=versioneer.get_version(),
     description='Docker Utilities/Patterns for Python Projects',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author='Daniel Rapp',
     url='https://github.com/rappdw/docker-utils.git',
     scripts=[
