@@ -28,19 +28,17 @@ A project that desires to make use of this utility should/can:
     As part of the image build, a file, `_version.py.bld`, will be generated and placed at the project 
     root. A `Dockerfile` can add that file to the image on creation to prevent the need for including the
     .git directory tree in the container context (usually quite expensive).
-3) Utilize built in support for [NVIDIA Docker 2.0](https://github.com/NVIDIA/nvidia-docker) to access GPUs in 
-container
-4) Create a docker/base directory to make use of built in external dependency isolation
+3) Create a docker/base directory to make use of built in external dependency isolation
 
     This capability supports environments where a docker build isn't able to access external dependencies (Docker Hub, 
     pypi, etc.), for instance a server in a "locked-down" environment. A base image can be defined to isolate any 
     dependencies that are required. That image can then be built and `transfer-image` used to transfer the base image 
     to the target environment.
      
-    Subsequent images can be built based of that image that are "self-contained" (relying only on source
+    Subsequent images can be built based off of that image that are "self-contained" (relying only on source
     from the project). The remote docker api can then be used to quickly iterate only requiring the more
     cumbersome transfer-image to be used when external dependencies change.
-5) Building and running images controlled through configuration (<project_dir>/docker/dockerutils.cfg)
+4) Building and running images controlled through configuration (<project_dir>/docker/dockerutils.cfg)
 
     Includes setting most docker parameters, i.e. volume mounts, ports, networks, commands, etc. with
     replacement varilable support for things like user, project root, etc.
@@ -56,7 +54,11 @@ together with any of the configuration for that image defined in `dockerutils.cf
 `transfer-image` takes a docker image name and used docker `save` and `load` to transfer the image to a remote host
 
 `publish-image` takes the name of one of the sub-directories in the `docker` directory and pushes the image built by 
-the docker file to the defined repository (AWS or Docker) 
+the docker file to the defined repository (AWS or Docker)
+
+`run-notebook` will start a docker container using either the notebook container found in the `docker/notebook` directory
+if it exists, or [rappdw/docker-ds](https://github.com/rappdw/docker-ds) otherwise. The current directory will be mounted
+into the container for use in the Juypter notebook environment. 
 
 # `dockerutils.cfg` Format
 Configuration in `docker/dockerutils.cfg` is used to customize behavior of the `build-image` and `run-image` CLI.

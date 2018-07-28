@@ -47,14 +47,19 @@ def image_operation(operation):
 
 
 if __name__ == '__main__':
-    with cd(get_root_dir()):
+    try:
+        root_dir = get_root_dir()
+    except ValueError as e:
+        print(str(e))
+        sys.exit(1)
+    with cd(root_dir):
         config = configparser.ConfigParser()
         config.optionxform = str
         config.read(os.path.join('docker', 'dockerutils.cfg'))
 
         gen_version_file()
 
-        with pip_conf(get_root_dir()):
+        with pip_conf(root_dir):
             image_types = get_image_types()
 
             parser = argparse.ArgumentParser()

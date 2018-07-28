@@ -3,12 +3,10 @@ import configparser
 import logging
 import os
 import getpass
-import sys
 
 logger = logging.getLogger(__name__)
 
 
-_ROOT_DIR = None
 def get_root_dir():
     '''
     get_root_dir will return the root directory of the project that contains a docker file.
@@ -18,16 +16,11 @@ def get_root_dir():
      various docker files that will be build (e.g. dev, lanista, jenkins, etc.)
     :return: root_directory for docker builda
     '''
-    global _ROOT_DIR # pylint: disable=global-statement
-
-    if _ROOT_DIR is None:
-        docker_dir = os.path.join(os.getcwd(), 'docker')
-        if os.path.exists(docker_dir) and os.path.isdir(docker_dir):
-            _ROOT_DIR = os.getcwd()
-        else:
-            raise ValueError(f'Unable to find docker directory. Invalid root: {os.getcwd()}')
-
-    return _ROOT_DIR
+    docker_dir = os.path.join(os.getcwd(), 'docker')
+    if os.path.exists(docker_dir) and os.path.isdir(docker_dir):
+        return os.getcwd()
+    else:
+        raise ValueError(f'Unable to find docker directory. Invalid root: {os.getcwd()}')
 
 
 def get_default_project_name():
