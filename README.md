@@ -1,6 +1,6 @@
 | Build | Test Coverage | Distro |
 | ----- | ------------- | ------ |
-| [![Build Status](https://api.travis-ci.org/rappdw/docker-utils.svg?branch=master)](https://travis-ci.org/rappdw/docker-utils) | [![Coverage Status](https://codecov.io/gh/rappdw/docker-utils/branch/master/graph/badge.svg)](https://codecov.io/gh/rappdw/docker-utils) | [![PyPI - Wheel](https://img.shields.io/pypi/wheel/dockerutils.svg)](https://pypi.org/project/dockerutils/)
+| [![Build Status](https://api.travis-ci.org/rappdw/docker-utils.svg?branch=master)](https://travis-ci.org/rappdw/docker-utils) | [![Coverage Status](https://codecov.io/gh/rappdw/docker-utils/branch/master/graph/badge.svg)](https://codecov.io/gh/rappdw/docker-utils) | [![PyPI - Version](https://img.shields.io/pypi/v/dockerutils.svg)](https://pypi.org/project/dockerutils/) [![PyPI - Wheel](https://img.shields.io/pypi/wheel/dockerutils.svg)](https://pypi.org/project/dockerutils/) |
 
 # Docker Utilities/Patterns for Python Projects
 
