@@ -1,23 +1,17 @@
-| Build | Test Coverage | Distro |
-| ----- | ------------- | ------ |
-| [![Build Status](https://api.travis-ci.org/rappdw/docker-utils.svg?branch=master)](https://travis-ci.org/rappdw/docker-utils) | [![Coverage Status](https://codecov.io/gh/rappdw/docker-utils/branch/master/graph/badge.svg)](https://codecov.io/gh/rappdw/docker-utils) | [![PyPI - Version](https://img.shields.io/pypi/v/dockerutils.svg)](https://pypi.org/project/dockerutils/) [![PyPI - Wheel](https://img.shields.io/pypi/wheel/dockerutils.svg)](https://pypi.org/project/dockerutils/) |
+[![TravisCI](https://api.travis-ci.org/rappdw/docker-utils.svg?branch=master)](https://travis-ci.org/rappdw/docker-utils) [![Coverage](https://codecov.io/gh/rappdw/docker-utils/branch/master/graph/badge.svg)](https://codecov.io/gh/rappdw/docker-utils) [![PyPi](https://img.shields.io/pypi/v/dockerutils.svg)](https://pypi.org/project/dockerutils/) [![PyPi](https://img.shields.io/pypi/wheel/dockerutils.svg)](https://pypi.org/project/dockerutils/)
 
 # Docker Utilities/Patterns for Python Projects
 
-There are cases in which it is advantageous to build multiple docker images from the same project.
-For instance:
+`dockerutils` defines a set of patterns and utilities to facilitate use of docker with a python app or library 
+facilitating:
 * seperating development/test dependencies out of production container, e.g. production container vs. dev/test container
 * seperating data science notebook container from execution container
 * environment experimentation
 * cases in which you want to "freeze" any external dependencies in one container and use that as a base
 for containers that are dependent solely on the project
 
-These utilities/patterns provide an opinionated way of accomplishing this. These utilities were built with
-a python project in mind, but the concepts extend to other project types.
+## Conventions
 
-# Conventions
-
-A project that desires to make use of this utility should/can:
 1) Create a docker directory tree at the root of the project
 
     In this directory tree there should be one sub-directory for each unique docker container type that is desired.
@@ -43,7 +37,7 @@ A project that desires to make use of this utility should/can:
     Includes setting most docker parameters, i.e. volume mounts, ports, networks, commands, etc. with
     replacement varilable support for things like user, project root, etc.
     
-# CLI
+## Command-line Interface
 
 `build-image` takes the name of one of the sub-directories in the `docker` directory and builds the
 image defined therein. The image is named \<project\>-\<subdir\>:\<user\>
@@ -51,7 +45,7 @@ image defined therein. The image is named \<project\>-\<subdir\>:\<user\>
 `run-image` takes the name of one of the sub-directories (or one of the synthetic images defined in `dockerutils.cfg`), 
 together with any of the configuration for that image defined in `dockerutils.cfg` and starts a docker container
 
-`transfer-image` takes a docker image name and used docker `save` and `load` to transfer the image to a remote host
+`transfer-image` takes a docker image name and uses docker `save` and `load` to transfer the image to a remote host
 
 `publish-image` takes the name of one of the sub-directories in the `docker` directory and pushes the image built by 
 the docker file to the defined repository (AWS or Docker)
@@ -60,10 +54,10 @@ the docker file to the defined repository (AWS or Docker)
 if it exists, or [rappdw/docker-ds](https://github.com/rappdw/docker-ds) otherwise. The current directory will be mounted
 into the container for use in the Juypter notebook environment. 
 
-# `dockerutils.cfg` Format
-Configuration in `docker/dockerutils.cfg` is used to customize behavior of the `build-image` and `run-image` CLI.
+## `dockerutils.cfg` Format
+Configuration in `docker/dockerutils.cfg` is used to configure behavior of the `dockerutils` scripts.
 
-## Image Section
+### Image Section
 The `dockerutils.cfg` file format allows for configuration sections named corresponding to the sub-directories in the 
 docker directory tree. Each of these sections may contain one of the following:
 
@@ -79,7 +73,7 @@ docker directory tree. Each of these sections may contain one of the following:
 * `image_repo` - the repository to publish the image to
 * `publication_tag` - the tag for publication (full image name + tag) 
 
-## Synthetic Images
+### Synthetic Images
 Additionally, "synthetic" images can be specified by adding a `run-image` section with a `synthetic_images` definition
 that contains a list of "synthetic" images. Each of these may also have a named section as defined for the docker
 sub-directories, but must also contain a `name` value that resolves to one of the docker sub-directories. For example:
@@ -93,7 +87,7 @@ name=dev
 ...
 ```
 
-## Image Tagging
+### Image Tagging
 The default tag for any image created/run/etc. is the user name in the host environment when running the 
 utility. This can be overriden by adding a `tag` value to the desired section. For example:
 
@@ -102,7 +96,7 @@ utility. This can be overriden by adding a `tag` value to the desired section. F
 tag=experiment.2017.12.16
 ...
 ```
-## Volume Replacement Variables
+### Volume Replacement Variables
 The volume specification may contain replacement variable designations of the form `{var}`. The supported variables
 include:
 
@@ -110,14 +104,14 @@ include:
 * `user` - will be replaced with the user name of the user running the command
 * `project` - replace with project namge
 
-## Image Push Replacement Variables
+### Image Push Replacement Variables
 * `account` - AWS account designation
 * `region` - AWS region
 * `image` - Image name
 * `tag` - Image tag 
 * `user` - will be replaced with the user name of the user running the command
 
-## Publish to AWS
+### Publish to AWS
 In order to publish to AWS, the repository will be the image name and the following should
 be configured for images that are published to AWS
 
@@ -126,9 +120,9 @@ image_repo=aws
 publication_tag={account}.dkr.ecr.{region}.amazonaws.com/{image}:{tag}"
 ```
 
-# Patterns
+## Patterns
 
-## Running your code in container, making live modifications outside container in your editor of choice     
+### Running your code in container, making live modifications outside container in your editor of choice     
 
 If you're like me, you have a whole set of tools in your host environment that you use to work with your project.
 One of the disadvantages of working with Docker can be the difficulty of transplanting those tools into the container
@@ -143,16 +137,16 @@ of `docker/dockertuils.cfg`).
 With this pattern you can run tests, experiment, etc. in container, make changes to the project in your host 
 environment toolset and immediately observe the changes that were made.
    
-## Working with a server in a locked-down environment
+### Working with a server in a locked-down environment
 You may find yourself in a situation in which you need to work with a server hosting Docker in an environment that has
 limited access to the "outside world". This pattern can be used to capture all external dependencies in a base 
 image that is built in an environment that is open, use `transfer-image` to send this base image to the server and
 then utilize a derived image dependent just on project sources and the base image to iterate without requiring open
 access on the server.
  
-## Adding test frameworks, code analysis tools, etc. to a container for testing/validation
+### Adding test frameworks, code analysis tools, etc. to a container for testing/validation
 
-## Tensorflow for both CPU and GPU in the same container
+### Tensorflow for both CPU and GPU in the same container
 It is sometimes useful to try both the CPU and GPU versions of Tensorflow. The example in `docker/tensorflow` provides
 a pattern to do so. All tensorflow depdendencies are installed into global python site-packages. Then virtual 
 environments are created for both cpu and gpu versions and the appropriate version of tensorflow is install into 
@@ -167,10 +161,7 @@ Upon container startup, the appropriate virtual environment (cpu or gpu) will be
 To switch between virtual envrionments utilized the symbolic links, `/cpu-env` and `/gpu-env`, e.g. 
 `source /cpu-env`.
 
-## Multistage Docker builds
-     
-
-## Versioneer support
+### Versioneer support
 If you aren't using [versioneer](https://github.com/warner/python-versioneer) to version your Python projects, you 
 should be. Versioneer utilizes .git to determine the project version. Having correct version information in container 
 is desireable in many cases, but pushing .git into container usually isn't desireable. To capture version information
@@ -178,12 +169,12 @@ for container, the `genversion` utility is available and uses capabilities of ve
 file in the project root. This file is available for `Dockerfile` to add/overwrite the version.py file within the 
 Docker image. An example of this is found in the cicd sub-directory.
 
-## `.dockerignore`
+### `.dockerignore`
 In order to minimize the context sent to Docker to build images, please see examples in `.dockerignore` in this
 repository.
 
-# A Note on Implementation
-I selected to use the Docker command line from python scripts rather than the [Docker
+## A Note on Implementation
+We selected to use the Docker command line from python scripts rather than the [Docker
 API available to Python](https://pypi.python.org/pypi/docker/) as it integrates better into my development loop. As each CLI prints 
 the Docker command it's using, if it does something unexpected, it's each to copy and paste
 the command used, modify it and be on your way without having to debug through CLI utility code, 
