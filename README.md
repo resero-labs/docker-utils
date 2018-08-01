@@ -52,7 +52,12 @@ the docker file to the defined repository (AWS or Docker)
 
 `run-notebook` will start a docker container using either the notebook container found in the `docker/notebook` directory
 if it exists, or [rappdw/docker-ds](https://github.com/rappdw/docker-ds) otherwise. The current directory will be mounted
-into the container for use in the Juypter notebook environment. 
+into the container for use in the Juypter notebook environment. There are a couple of environment variable to be aware of 
+with this command:
+
+* DOCKER_DS_DONT_PULL - if set, the version of rappdw/docker-ds currently available will be used rather than pulling 
+the latest version from docker hub.
+* DOCKER_DS_DIFFS - if set,  
 
 ## `dockerutils.cfg` Format
 Configuration in `docker/dockerutils.cfg` is used to configure behavior of the `dockerutils` scripts.
