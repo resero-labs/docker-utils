@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-import codecs
 from os import path
-import sys
 import versioneer
 
 from setuptools import setup, find_packages
