@@ -1,4 +1,4 @@
-[![TravisCI](https://api.travis-ci.org/resero-labs/docker-utils.svg?branch=master)](https://travis-ci.org/resero-labs/docker-utils) [![Coverage](https://codecov.io/gh/rappdw/docker-utils/branch/master/graph/badge.svg)](https://codecov.io/gh/rappdw/docker-utils) [![PyPi](https://img.shields.io/pypi/v/dockerutils.svg)](https://pypi.org/project/dockerutils/) [![PyPi](https://img.shields.io/pypi/wheel/dockerutils.svg)](https://pypi.org/project/dockerutils/)
+[![TravisCI](https://api.travis-ci.org/resero-labs/docker-utils.svg?branch=master)](https://travis-ci.org/resero-labs/docker-utils) [![Coverage](https://codecov.io/gh/rappdw/docker-utils/branch/master/graph/badge.svg)](https://codecov.io/gh/resero-labs/docker-utils) [![PyPi](https://img.shields.io/pypi/v/dockerutils.svg)](https://pypi.org/project/dockerutils/) [![PyPi](https://img.shields.io/pypi/wheel/dockerutils.svg)](https://pypi.org/project/dockerutils/)
 
 # Docker Utilities/Patterns for Python Projects
 
