@@ -25,7 +25,7 @@ setup_options = dict(
     author='Resero-Labs',
     url='https://github.com/resero-labs/docker-utils.git',
     scripts=[
-        'scripts/aws-create-dock',
+        'scripts/create-dock',
         'scripts/build-image',
         'scripts/dock',
         'scripts/dock-sync',
