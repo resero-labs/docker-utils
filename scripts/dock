@@ -75,7 +75,7 @@ update_dock_prompt() {
     _UNDOCKED_PS1="$PS1"
   fi
 
-  if [ "$0" == "zsh" ]; then
+  if [ "$SHELL" = "/bin/zsh" ]; then
     PS1=$PS1${_DOCK_MONIKER}
   else
     PS1=$PS1${_DOCK_MONIKER}
@@ -96,7 +96,7 @@ castoff() {
   unset DOCKER_IP
 
   if [ -n "$_OLD_VIRTUAL_PS1" ]; then
-    if [ "$0" == "zsh" ]; then
+    if [ "$SHELL" = "/bin/zsh" ]; then
       _OLD_VIRTUAL_PS1="${_OLD_VIRTUAL_PS1%$_DOCK_MONIKER}"
     else
       _OLD_VIRTUAL_PS1=${_OLD_VIRTUAL_PS1%"$_DOCK_MONIKER"}
@@ -104,7 +104,7 @@ castoff() {
     export _OLD_VIRTUAL_PS1
   fi
 
-  if [ "$0" == "zsh" ]; then
+  if [ "$SHELL" = "/bin/zsh" ]; then
     PS1=${PS1%$_DOCK_MONIKER}
   else
     PS1=${PS1%"$_DOCK_MONIKER"}
