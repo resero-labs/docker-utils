@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+#vim :set filetype=sh:
+
+set -e
+
+cd "$(dirname $0)"; cd ..
+
+WORK_VENV=${WORK_VENV:-$PWD/.venv}
+IN_VENV=${VIRTUAL_ENV:-}
+
+function display {
+	msg=$1
+	echo -e "\e[32m${msg}\e[0m"
+}
+
+if [ ! -z $IN_VENV ]; then
+	if [[ $WORK_VENV = $VIRTUAL_ENV ]]; then
+		display "You are already in your activated virtual environment"
+	else
+		display "Your current virtual environment does not match the project virtual environment"
+    display "\t$WORK_VENV != $VIRTUAL_ENV"
+    display "Either deactivate your current environment or set WORK_ENV to your current venv"
+    exit 1
+  fi
+else
+	if [ ! -d $WORK_VENV ]; then
+		display "No venv found at $WORK_VENV so creating"
+		python3 -m venv $WORK_VENV
+		if [ ! -e activate ]; then
+			echo -e "Creating an alias activate for virtual environment"
+			ln -s $WORK_VENV/bin/activate activate
+		fi
+	fi
+
+	display "Activating virtual environment at $WORK_VENV"
+	source $WORK_VENV/bin/activate
+fi
+
+display "Installing application (and dependencies)"
+#echo -e "Installing application (and dependencies)"
+pip install -e .
+
+if [ -z $IN_VENV ]; then
+	display "Environment is setup, activate using either of the following commands"
+	display "\tsource activate\n\tsource $WORK_VENV/bin/activate"
+fi

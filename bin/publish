@@ -5,11 +5,21 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 cd ..
 
+echo "Making sure we have the latest tags"
+git pull --tags
+
 if [ -z "$VIRTUAL_ENV" ]; then
     . activate
 fi
 
+echo "Cleaning out old built wheels"
+rm -f dist/*
 
+echo "Installing/Verifying wheel and twine"
 pip install wheel twine
+
+echo "Creating the new wheel and storing in the dist/ directory"
 python setup.py bdist_wheel -d dist
+
+echo "Uploading to pypi (be sure to have entry in ~/.pypirc)"
 twine upload -r pypi dist/*
