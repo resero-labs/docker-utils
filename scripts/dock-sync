@@ -9,14 +9,10 @@
 
 function do-sync-up() {
     echo "Syncing $1 to remote dock ($2)"
-    if [ -e .gitignore ]; then
-        local HAS_GITIGNORE=1
-    fi
     if [ -e .dockerignore ]; then
         local HAS_DOCKERIGNORE=1
     fi
     rsync -azq --delete \
-        ${HAS_GITIGNORE:+--filter=":- .gitignore"} \
         ${HAS_DOCKERIGNORE:+--filter=":- .dockerignore"} \
         -e "ssh -o LogLevel=error -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" $1 $2
     echo "Sync complete"
@@ -24,15 +20,11 @@ function do-sync-up() {
 
 function do-sync-down() {
     echo "Syncing from remote dock ($1)"
-    if [ -e .gitignore ]; then
-        local HAS_GITIGNORE=1
-    fi
     if [ -e .dockerignore ]; then
         local HAS_DOCKERIGNORE=1
     fi
     set -x
     rsync -azq \
-        ${HAS_GITIGNORE:+--filter=".- .gitignore"} \
         ${HAS_DOCKERIGNORE:+--filter=".- .dockerignore"} \
         ${3:+--exclude=$3} \
         -e "ssh -o LogLevel=error -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" $1 $2
