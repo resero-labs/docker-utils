@@ -3,7 +3,6 @@
 # Python script to run containers associated with a project
 #
 import argparse
-import configparser
 import datetime
 import getpass
 import json
@@ -13,6 +12,8 @@ import subprocess
 import sys
 import urllib.parse
 import urllib.request
+
+import toml
 
 from dockerutils import *
 
@@ -26,7 +27,7 @@ def fetch_env_variables(config, image, args_env=None):
         for arg_env in args_env:
             env_var = arg_env.split('=')
             env_vars[env_var[0]] = env_var[1]
-    if 'env_var_names' in config.sections():
+    if 'env_var_names' in config:
         endpoint = f"http://{os.environ.get(config['env_var_names']['remote_ip'])}:" \
                    f"{os.environ.get(config['env_var_names']['remote_port'], '5000')}/config"
         try:
@@ -74,9 +75,8 @@ def run(mode, image_name, image_tag, **kwargs):
 
 if __name__ == '__main__':
     with cd(get_root_dir()):
-        config = configparser.ConfigParser()
-        config.optionxform = str
-        config.read(os.path.join('docker', 'dockerutils.cfg'))
+        with open(os.path.join('docker', 'dockerutils.cfg')) as cfg_file:
+            config = toml.load(cfg_file)
 
         if 'run_image' in config and 'synthetic_images' in config['run_image']:
             image_types = get_image_types(config['run_image']['synthetic_images'].split(','))
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
         is_docked = bool(os.environ.get('DOCKER_IP'))
 
-        if args.image in config.sections():
+        if args.image in config:
             for key in run_config.keys():
                 docked_key = f"{key}_docked"
                 if is_docked and not run_config[key] and docked_key in config[args.image]:

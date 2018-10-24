@@ -3,11 +3,12 @@
 # Python script to build/clean containers associated for a project
 #
 import argparse
-import configparser
 import os
 import shlex
 import subprocess
 import sys
+
+import toml
 
 from dockerutils import *
 
@@ -80,9 +81,8 @@ if __name__ == '__main__':
         print(str(e))
         sys.exit(1)
     with cd(root_dir):
-        config = configparser.ConfigParser()
-        config.optionxform = str
-        config.read(os.path.join('docker', 'dockerutils.cfg'))
+        with open(os.path.join('docker', 'dockerutils.cfg')) as cfg_file:
+            config = toml.load(cfg_file)
 
         gen_version_file()
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
                 pull_FROM_on_force = False
                 image_config = {}
-                if image in config.sections():
+                if image in config:
                     image_config = config[image]
                     if 'pull_FROM_on_force' in image_config:
                         pull_FROM_on_force = config[image]['pull_FROM_on_force']

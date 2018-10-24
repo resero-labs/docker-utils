@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import base64
-import configparser
 import getpass
 import os
 import shlex
@@ -10,6 +9,7 @@ import sys
 import traceback
 
 import boto3
+import toml
 
 from dockerutils import *
 
@@ -46,9 +46,8 @@ def run(cmd: str):
 
 if __name__ == '__main__':
     with cd(get_root_dir()):
-        config = configparser.ConfigParser()
-        config.optionxform = str
-        config.read(os.path.join('docker', 'dockerutils.cfg'))
+        with open(os.path.join('docker', 'dockerutils.cfg')) as cfg_file:
+            config = toml.load(cfg_file)
 
         image_types = get_image_types()
 
@@ -65,7 +64,7 @@ if __name__ == '__main__':
             'image_repo': '',  # one of ['aws', 'docker_hub']
             'publication_tag': '',
         }
-        if args.image in config.sections():
+        if args.image in config:
             for key in push_config.keys():
                 if not push_config[key] and key in config[args.image]:
                     push_config[key] = config[args.image][key]

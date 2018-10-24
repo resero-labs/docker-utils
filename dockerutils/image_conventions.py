@@ -1,8 +1,8 @@
 """Functions that enforce conventions surrounding docker images."""
-import configparser
 import logging
 import os
 import getpass
+import toml
 
 logger = logging.getLogger(__name__)
 
@@ -29,21 +29,20 @@ def get_default_project_name():
 
 def get_image_designation(image, config=None):
     if not config:
-        os.path.join(get_root_dir(), os.path.join('docker', 'dockerutils.cfg'))
-        config = configparser.ConfigParser()
-        config.read(os.path.join(get_root_dir(), os.path.join('docker', 'dockerutils.cfg')))
+        with open(os.path.join(get_root_dir(), os.path.join('docker', 'dockerutils.cfg'))) as cfg_file:
+            config = toml.load(cfg_file)
     return (get_image_name(config, image), get_image_tag(config, image))
 
 
 def get_image_name(config, image):
-    if image in config.sections():
+    if image in config:
         if 'name' in config[image]:
             return f'{get_default_project_name()}-{config[image]["name"]}'
     return f'{get_default_project_name()}-{image}'
 
 
 def get_image_tag(config, image):
-    if image in config.sections():
+    if image in config:
         if 'tag' in config[image]:
             return config[image]['tag']
     return getpass.getuser()

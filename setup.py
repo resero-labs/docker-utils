@@ -54,7 +54,8 @@ setup_options = dict(
     ],
     install_requires=[
         'awscli',
-        'boto3'
+        'boto3',
+        'toml'
     ],
     extras_require={
         'dev': [
