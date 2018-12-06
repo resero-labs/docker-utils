@@ -19,6 +19,7 @@ function do-sync-up() {
     read RESPONSE
     if [ "$RESPONSE" = "y" ]; then DESTRUCTIVE="--delete"; fi
 
+    echo rsync -azq ${DESTRUCTIVE} ${HAS_DOCKERIGNORE:+--filter=":- .dockerignore"} -e "ssh -o LogLevel=error -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" $1 $2
     rsync -azq ${DESTRUCTIVE} \
         ${HAS_DOCKERIGNORE:+--filter=":- .dockerignore"} \
         -e "ssh -o LogLevel=error -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" $1 $2
@@ -36,6 +37,8 @@ function do-sync-down() {
     echo "Use 'delete' option with rsync (destructive)? Type enter to bypass, y to use 'delete': "
     read RESPONSE
     if [ "$RESPONSE" = "y" ]; then DESTRUCTIVE="--delete"; fi
+
+    echo rsync -azq ${DESTRUCTIVE} ${HAS_DOCKERIGNORE:+--filter=".- .dockerignore"}  ${3:+--exclude=$3} -e "ssh -o LogLevel=error -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" $1 $2
 
     rsync -azq ${DESTRUCTIVE} \
         ${HAS_DOCKERIGNORE:+--filter=".- .dockerignore"} \
