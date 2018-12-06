@@ -5,7 +5,14 @@ sleep 30
 
 # update apt and install dependencies
 sudo apt-get update
-sudo apt-get install -y gcc make apt-transport-https ca-certificates curl software-properties-common
+sudo apt-get install -y \
+    apt-transport-https \
+    aws-cli \
+    ca-certificates \
+    curl \
+    gcc \
+    make \
+    software-properties-common
 
 # get the latest nvidia drivers and install them
 wget -P /tmp http://us.download.nvidia.com/tesla/396.44/NVIDIA-Linux-x86_64-396.44.run

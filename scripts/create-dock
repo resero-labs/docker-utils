@@ -65,11 +65,11 @@ print_help() {
     echo -e "\n -i instance-type\n    The default instance type is ${INSTANCE_TYPE} (no GPU).\n    Other options include p2.xlarge (GPU), m5.2xlarge, etc."
     echo -e "\n -a ami-id\n    (Optional) The ami to use for the instance."
     echo -e "\n -h help\n    This help"
-    echo 
+    echo
     echo "Examples"
     echo
     echo -e "  $ create-dock\n    Create default instance type ($INSTANCE_TYPE) named ${INSTANCE_NAME}.\n    CLI prompt moniker when docked will be [dock:IP address]."
-    echo 
+    echo
     echo -e "  $ create-dock -i t2.micro -m my-dock\n    Create t2.micro instance type named ${INSTANCE_NAME}.\n    CLI prompt moniker when docked will be [dock:my-dock]."
 
 
@@ -126,14 +126,13 @@ if [ -e "$HOME/.docker/dock.cfg" ]; then
     source "$HOME/.docker/dock.cfg"
 else
     key_name="resero-staging"
-    security_group_ids='"sg-213eb35a" "sg-3bde0341" "sg-b93e0dc2" "sg-1bd90461"'
+    security_group_ids="sg-213eb35a sg-3bde0341 sg-b93e0dc2 sg-1bd90461"
     iam_instance_profile="lanista-app"
     subnet_id="subnet-b8b440de"
-    tag_specifications='"ResourceType=instance,Tags=[{Key=Name,Value=${INSTANCE_NAME}},\
-            {Key=os,Value=Ubuntu},{Key=os_version,Value=16.04.3},{Key=app_type,Value=model},\
-            {Key=business_unit,Value=\"Archiving & Governance\"},{Key=component,Value=\"ec2 instance\"},\
-            {Key=product,Value=\"Resero Development\"},{Key=support_level,Value=dev},\
-            {Key=created_by,Value=${USERNAME}}]"'
+    tag_specifications="ResourceType=instance,Tags=[{Key=Name,Value=${INSTANCE_NAME}},\
+            {Key=business_unit,Value='Archiving & Governance'},{Key=component,Value='ec2 instance'},\
+            {Key=product,Value='Resero Development'},{Key=support_level,Value=dev},\
+            {Key=created_by,Value=${USERNAME}}]"
 fi
 if [ ! -f "$HOME/.ssh/$key_name" ]; then
     echo
@@ -149,9 +148,9 @@ INSTANCE_ID=$(aws ec2 run-instances \
     --instance-type "${INSTANCE_TYPE}" \
     --block-device-mappings "DeviceName='/dev/sda1',Ebs={VolumeSize=100,VolumeType='gp2'}" \
     --tag-specifications "${tag_specifications}" \
-    --iam-instance-profile Name="${iam_instance_profile}"\
+    --iam-instance-profile Name="${iam_instance_profile}" \
     --key-name "${key_name}" \
-    --security-group-ids "${security_sgroup_ids}" \
+    --security-group-ids "${security_group_ids}" \
     | grep InstanceId | awk -F '"' '{print $4}' \
     )
 
