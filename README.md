@@ -17,12 +17,12 @@ for containers that are dependent solely on the project
     In this directory tree there should be one sub-directory for each unique docker container type that is desired.
     Each of these sub-directories would contain the `Dockerfile` that will be used to create the image
     as well as any source specific to that image.
-2) Use versioneer for project versioning. 
+2) Use versioneer for project versioning (Optional). 
 
     As part of the image build, a file, `_version.py.bld`, will be generated and placed at the project 
     root. A `Dockerfile` can add that file to the image on creation to prevent the need for including the
     .git directory tree in the container context (usually quite expensive).
-3) Create a docker/base directory to make use of built in external dependency isolation
+3) Create a docker/base directory to make use of built in external dependency isolation (optional)
 
     This capability supports environments where a docker build isn't able to access external dependencies (Docker Hub, 
     pypi, etc.), for instance a server in a "locked-down" environment. A base image can be defined to isolate any 
@@ -39,6 +39,7 @@ for containers that are dependent solely on the project
     
 ## Command-line Interface
 
+### Image cli
 `build-image` takes the name of one of the sub-directories in the `docker` directory and builds the
 image defined therein. The image is named \<project\>-\<subdir\>:\<user\>
 
@@ -50,25 +51,33 @@ together with any of the configuration for that image defined in `dockerutils.cf
 `publish-image` takes the name of one of the sub-directories in the `docker` directory and pushes the image built by 
 the docker file to the defined repository (AWS or Docker)
 
+### Notebook cli
 `run-notebook` will start a docker container using either the notebook container found in the `docker/notebook` directory
 if it exists, or [rappdw/docker-ds](https://github.com/rappdw/docker-ds) otherwise. The current directory will be mounted
 into the container for use in the Juypter notebook environment. There are a couple of environment variable to be aware of 
 with this command:
 
+* DOCKER_DS_DONT_PULL - if set, the version of rappdw/docker-ds currently available will be used rather than pulling 
+the latest version from docker hub.
+* DOCKER_DS_DIFFS - if set,  
+
+### Dock cli
+
+A "dock" is a remote system that has a docker daemon running and configured in a secure fashion (generally an EC2 
+instance). You can "dock" your terminal to a remote instance and any docker commands, including image and notebook cli
+above will be run against the remote docker server. Once a "dock" is created, you can dock your terminal by issuing 
+the command `source dock <server IP or moniker>`
+
 `create-dock` will start an ec2 instance that can be used for remote docking. This instance is configured to provide 
 secure interaction with the docker server, as well as to support GPU utliziation (`-g` option with `run-image`)
+
+`destroy-dock` will terminate a remote dock instance and delete any local configuration files
 
 `stop-dock` will change the instances state of a remote dock to `stopped`
 
 `start-dock` will change the instance state of a remote dock to `running`
 
-`destroy-dock` will terminate a remote dock instance and delete any local configuration files
-
 `ssh-dock` opens a terminal on the remote dock with ssh
-
-* DOCKER_DS_DONT_PULL - if set, the version of rappdw/docker-ds currently available will be used rather than pulling 
-the latest version from docker hub.
-* DOCKER_DS_DIFFS - if set,  
 
 ## `dockerutils.cfg` Format
 Configuration in `docker/dockerutils.cfg` is used to configure behavior of the `dockerutils` scripts.
@@ -104,6 +113,12 @@ synthetic_images=shell
 name=dev
 ...
 ```
+
+### Configuration-only Images
+If there is a docker container that does what you want already, you can create a configuration-only image by 
+specifying `name`, `tag` and `prefix=False` in the configuration section for the image. For example the base notebook 
+image `rappdw/docker-ds` is often sufficient for running a Jupyter notebook against your code, as it auto detects a 
+`setup.py` upon container start and installs the module into the notebook environment.
 
 ### Image Tagging
 The default tag for any image created/run/etc. is the user name in the host environment when running the 

@@ -39,7 +39,6 @@ function do-sync-down() {
     if [ "$RESPONSE" = "y" ]; then DESTRUCTIVE="--delete"; fi
 
     echo rsync -azq ${DESTRUCTIVE} ${HAS_DOCKERIGNORE:+--filter=".- .dockerignore"}  ${3:+--exclude=$3} -e "ssh -o LogLevel=error -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" $1 $2
-
     rsync -azq ${DESTRUCTIVE} \
         ${HAS_DOCKERIGNORE:+--filter=".- .dockerignore"} \
         ${3:+--exclude=$3} \
