@@ -150,7 +150,7 @@ INSTANCE_ID=$(aws ec2 run-instances \
     --tag-specifications "${tag_specifications}" \
     --iam-instance-profile Name="${iam_instance_profile}" \
     --key-name "${key_name}" \
-    --security-group-ids "${security_group_ids}" \
+    --security-group-ids ${security_group_ids} \
     | grep InstanceId | awk -F '"' '{print $4}' \
     )
 
