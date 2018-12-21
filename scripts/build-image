@@ -85,10 +85,10 @@ if __name__ == '__main__':
         config.read(os.path.join('docker', 'dockerutils.cfg'))
 
         if os.path.isfile('setup.cfg'):
-            config = configparser.ConfigParser()
-            config.optionxform = str
-            config.read('setup.cfg')
-            if 'versioneer' in config:
+            config_versioneer = configparser.ConfigParser()
+            config_versioneer.optionxform = str
+            config_versioneer.read('setup.cfg')
+            if 'versioneer' in config_versioneer:
                 gen_version_file()
 
         with pip_conf(root_dir):
