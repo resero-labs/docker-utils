@@ -9,7 +9,7 @@ NO_COLOR='\033[0m'
 confirm_stop() {
     if [ -z "$1" ]; then
         echo -e "Stop dock?"
-        read -e -p "Type enter to Cancel, h for Help, y to Create: " RESPONSE
+        read -e -p "Type enter to Cancel, h for Help, y to Stop Instance: " RESPONSE
     fi
 
     if [ "$RESPONSE" == "h" ]; then print_help; fi

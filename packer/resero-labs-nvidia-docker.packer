@@ -1,7 +1,7 @@
 {
   "builders": [
     {
-      "ami_name": "resero-labs-nvidia-docker-2019.01",
+      "ami_name": "resero-labs-nvidia-docker-2019.01.1",
       "type": "amazon-ebs",
       "force_deregister": "true",
       "instance_type": "p3.2xlarge",
@@ -35,39 +35,29 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "setup-v1.sh",
-      "destination": "/home/ubuntu/setup-v1.sh"
-    },
-    {
-      "type": "shell",
-      "inline": [
-        "sudo /home/ubuntu/setup-v1.sh",
-        "rm /home/ubuntu/setup-v1.sh"
-      ]
+      "source": "upgrade.sh",
+      "destination": "/home/ubuntu/upgrade.sh"
     },
     {
       "type": "file",
-      "source": "configure-docker-v1.sh",
-      "destination": "/home/ubuntu/configure-docker-v1.sh"
+      "source": "setup.sh",
+      "destination": "/home/ubuntu/setup.sh"
     },
     {
       "type": "shell",
       "inline": [
-        "sudo /home/ubuntu/configure-docker-v1.sh",
-        "rm /home/ubuntu/configure-docker-v1.sh"
-      ]
-    },
-    {
-      "type": "file",
-      "source": "etc-rc.local",
-      "destination": "/home/ubuntu/rc.local"
+        "sudo /home/ubuntu/upgrade.sh"
+      ],
+      "expect_disconnect": true
     },
     {
       "type": "shell",
       "inline": [
-        "sudo cp /home/ubuntu/rc.local /etc/rc.local",
-        "rm /home/ubuntu/rc.local"
-      ]
+        "rm /home/ubuntu/upgrade.sh",
+        "sudo /home/ubuntu/setup.sh",
+        "rm /home/ubuntu/setup.sh"
+      ],
+      "pause_before": "30s"
     },
     {
       "type": "shell",

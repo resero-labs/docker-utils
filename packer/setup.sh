@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
-# wait just a bit to allow everything to settle down
-sleep 30
-
-# update apt and install dependencies
-sudo apt-get update
+# install dependencies
 sudo apt-get install -y \
     apt-transport-https \
     ca-certificates \
@@ -30,3 +26,19 @@ curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.li
 sudo apt-get update
 sudo apt-get install -y docker-ce \
     nvidia-docker2
+
+# configure docker:
+# put ubuntu user in docker group
+# remove unix socket from docker config (we are going to allow TLS network sockets only)
+# key/cert setup is in register-dock
+sudo usermod -aG docker ubuntu
+sudo systemctl stop docker
+sudo sed -i 's"dockerd\ -H\ unix://"dockerd"g' /lib/systemd/system/docker.service
+sudo systemctl daemon-reload
+sudo systemctl start docker
+
+# disable unattended-updates
+# kernel updates, though infrequent, can mess up both the docker daemon and the nvidia drivers
+# rather than doing unattended-updates, we should periodically update the AMI by simply rebuilding
+# the image
+sudo sed -i 's/APT::Periodic::Unattended-Upgrade "1";/APT::Periodic::Unattended-Upgrade "0";/g' /etc/apt/apt.conf.d/20auto-upgrades
