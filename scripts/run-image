@@ -17,7 +17,7 @@ import urllib.request
 from dockerutils import *
 
 _base_cmd = 'docker run {init} --name {name} {environment} {keep_container} {interactive} {gpu} {network} ' \
-            '{volumes} {ports} {image_name}:{image_tag} \'{cmd}\''
+            '{volumes} {ports} {image_name}:{image_tag} {cmd}'
 
 def fetch_env_variables(config, image, args_env=None):
     # a special use case. retrieve env variables from a config server.
