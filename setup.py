@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 from os import path
 import versioneer
+import sys
+if sys.version_info < (3,6):
+    sys.exit('Sorry, Python < 3.6 is not supported')
 
 from setuptools import setup, find_packages
 
