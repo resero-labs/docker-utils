@@ -29,12 +29,6 @@ print_help() {
     exit 0
 }
 
-if [[ -z "$MONIKER" ]]; then
-    print_help
-    exit -1
-fi
-
-
 # Parse command line arguments in any order
 while getopts 'h' flag; do    # if a character is followed by a colon, that argument is expected to have an argument.
   case "${flag}" in
@@ -42,6 +36,11 @@ while getopts 'h' flag; do    # if a character is followed by a colon, that argu
     *) error "Unexpected option ${flag}" ;;
   esac
 done
+
+# Help
+if [ -n "$hflag" ] || [ "$RESPONSE" == "h" ]; then
+    print_help
+fi
 
 # Look up IP from moniker
 FOUND_MONIKER=false

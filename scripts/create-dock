@@ -163,7 +163,7 @@ if [ ! -z "$INSTANCE_ID" ]; then
 
     if [ $(echo $IP_ADDRESS | grep -c -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}') == 1 ]; then
         echo 'Registering secure remote docker api'
-        register-dock ubuntu "$IP_ADDRESS" "$MONIKER"
+        register-dock ubuntu "$IP_ADDRESS" "$MONIKER" "$INSTANCE_ID"
     fi
 
     echo "New EC2 instance available to dock at $IP_ADDRESS"

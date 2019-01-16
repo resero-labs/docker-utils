@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -e
+
+# Default Values
+GREEN='\033[0;32m'
+NO_COLOR='\033[0m'
+
+print_help() {
+    echo "List dockx - Help"
+    echo
+    echo "Description"
+    echo "  This script enumerates all docks defined and prints their current state."
+    echo
+    echo "Usage"
+    echo "  $ ls-dock"
+    echo
+
+    exit 0
+}
+
+# Parse command line arguments in any order
+while getopts 'h' flag; do    # if a character is followed by a colon, that argument is expected to have an argument.
+  case "${flag}" in
+    h) hflag='true';;
+    *) error "Unexpected option ${flag}" ;;
+  esac
+done
+
+get_instance_id() {
+    aws ec2 describe-instances \
+        --filters Name=private-ip-address,Values="$1" \
+        --query 'Reservations[*].Instances[*].InstanceId' --output text
+}
+
+# for each directory in ~/.docker, describe the instance
+for f in $HOME/.docker/*; do
+    if [ -d $f ] && [ -f $f/connection_config.txt ]; then
+      while read -r line; do declare $line; done < "$f/connection_config.txt"
+      if [ -z ${DOCK_MONIKER+x} ]; then
+        DOCK_MONIKER=$(basename $f)
+      else
+        DOCK_MONIKER=$DOCK_MONIKER" ($(basename $f))"
+      fi
+      if [ -z ${DOCK_INSTANCE_ID+x} ]; then
+        echo $DOCK_MONIKER": "$(aws ec2 describe-instances --filters Name=private-ip-address,Values="$DOCK_IP" --query 'Reservations[*].Instances[*].State.Name' --output text)
+      else
+        echo $DOCK_MONIKER": "$(aws ec2 describe-instances --instance-ids $DOCK_INSTANCE_ID --query 'Reservations[*].Instances[*].State.Name' --output text)
+      fi
+
+    fi
+done
+
