@@ -34,6 +34,7 @@ setup_options = dict(
         'scripts/dock',
         'scripts/dock-sync',
         'scripts/genversion',
+        'scripts/ls-dock',
         'scripts/publish-image',
         'scripts/register-dock',
         'scripts/run-image',
