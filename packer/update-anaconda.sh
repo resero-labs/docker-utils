@@ -7,11 +7,8 @@ conda update -y -n base -c defaults conda
 # remove the last lines of .profile, .dlamirc, and .zshrc which add anaconda/bin to the path,
 # instead, we'll use "current" anaconda style of sourcing the profile
 echo 'Converting to "modern" style conda'
-sed -i '$ d' .profile
-sed -i '$ d' .dlamirc
-sed -i '$ d' .zshrc
-echo ". /home/ubuntu/anaconda3/etc/profile.d/conda.sh" >> ~/.profile
-echo "conda activate base" >> ~/.profile
+echo ". /home/ubuntu/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc
+conda init
 
 # change the MOTD to reflect the "current style", e.g. conda source <env>
 sudo sed -i 's/source activate/conda activate/g' /etc/update-motd.d/00-header

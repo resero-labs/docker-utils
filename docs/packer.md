@@ -1,12 +1,14 @@
 # To build new packer image
 
-1. Update version in ami-name in `packer/resero-labs-nvidia-docker.packer`
-2. Update nvidia driver versions in `packer/setup-v1.sh`
-3. Run the following: 
+1. Update version in ami-name in `packer/resero-labs-dl.packer`
+2. Run the following: 
     ```bash
     $ cd packer
-    $ packer build resero-labs-nvidia-docker.packer
+    $ packer build resero-labs-dl.packer
     ```
-4. after testing, use the AWS console to change the image currently named "resero-labs-nvidia-docker" to
-"resero-labs-nvidia-docker-<dated.version>", and change the name of the image just created, 
-"resero-labs-nvidia-docker-latest" to "resero-labs-nvidia-docker" 
+3. after testing, use the AWS console to change the image currently named "resero-labs-dlami" to
+"resero-labs-dlami-<dated.version>", and change the name of the image just created, 
+"resero-labs-dlami-latest" to "resero-labs-dlami"
+
+**Note**: the `b` in the AMI name indicates the AWS Deep Learning AMI Version number that was used
+as a base for the AMI 
