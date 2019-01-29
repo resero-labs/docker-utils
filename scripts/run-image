@@ -29,10 +29,10 @@ def fetch_env_variables(config, image, args_env=None):
         for arg_env in args_env:
             env_var = arg_env.split('=')
             env_vars[env_var[0]] = env_var[1]
-    if image in config and 'env' in config[image]:
-        env_section = config[image]['env']
-        for evars in config[env_section]:
-            env_vars[evars] = config[env_section][evars]
+    if config.has_section(image) and config.has_option(image, 'env'):
+        env_section = config.get(image, 'env')
+        for evars in config.options(env_section):
+            env_vars[evars] = config.get(env_section, evars)
     return ' '.join(['-e {key}={value}'.format(key=key, value=value) for key, value in env_vars.items()])
 
 

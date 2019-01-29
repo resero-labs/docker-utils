@@ -7,6 +7,10 @@
 # on sync down we need to use the `.-` filter syntax
 # also on sync down we don't want to use --delete and we add a third parameter that is an additional ignore file
 
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NO_COLOR='\033[0m'
+
 function do-sync-up() {
     echo "Syncing $1 to remote dock ($2)"
     if [ -e .dockerignore ]; then
@@ -15,7 +19,8 @@ function do-sync-up() {
 
     local RESPONSE
     local DESTRUCTIVE=""
-    echo "Use 'delete' option with rsync (destructive)? Type enter to bypass, y to use 'delete': "
+    echo ""
+    echo -e "${GREEN}Use 'delete' option with rsync (destructive)? ${RED}enter${GREEN} to bypass, ${RED}y${GREEN} to use 'delete': ${NO_COLOR}"
     read RESPONSE
     if [ "$RESPONSE" = "y" ]; then DESTRUCTIVE="--delete"; fi
 
@@ -34,7 +39,8 @@ function do-sync-down() {
 
     local RESPONSE
     local DESTRUCTIVE=""
-    echo "Use 'delete' option with rsync (destructive)? Type enter to bypass, y to use 'delete': "
+    echo ""
+    echo -e "${GREEN}Use 'delete' option with rsync (destructive)? ${RED}enter${GREEN} to bypass, ${RED}y${GREEN} to use 'delete': ${NO_COLOR}"
     read RESPONSE
     if [ "$RESPONSE" = "y" ]; then DESTRUCTIVE="--delete"; fi
 

@@ -20,24 +20,22 @@ def is_multistage(mode):
     return 'as builder' in open('docker/{mode}/Dockerfile'.format(mode=mode)).read()
 
 
-def run_pre_script(script, config):
+def run_pre_script(script):
     print('Running pre-build-script: "{script}"'.format(script=script))
     return subprocess.call(shlex.split(script), cwd=os.getcwd())
 
 
-def run_post_script(script, config):
+def run_post_script(script):
     print('Running post-build-script: "{script}"'.format(script=script))
     return subprocess.call(shlex.split(script), cwd=os.getcwd())
 
 
-def build(image, image_name, image_tag, config=None, pull=False):
-    if config is None:
-        config = {}
-    pre_script = config.get('pre_build_script', None)
-    post_script = config.get('post_build_script', None)
+def build(image, image_name, image_tag, config, pull=False):
+    pre_script = config.get(image, 'pre_build_script') if config.has_option(image, 'pre_build_script') else None
+    post_script = config.get(image, 'post_build_script') if config.has_option(image, 'post_build_script') else None
 
     if pre_script:
-        rc = run_pre_script(pre_script, config=config)
+        rc = run_pre_script(pre_script)
         if rc != 0:
             print('pre-build-script failed: {rc}'.format(rc=rc))
             return rc
@@ -63,7 +61,7 @@ def build(image, image_name, image_tag, config=None, pull=False):
         return rc
 
     if post_script:
-        rc = run_post_script(post_script, config=config)
+        rc = run_post_script(post_script)
 
     return rc
 
@@ -96,7 +94,7 @@ if __name__ == '__main__':
             config_versioneer = ConfigParser()
             config_versioneer.optionxform = str
             config_versioneer.read('setup.cfg')
-            if 'versioneer' in config_versioneer:
+            if config.has_section('versioneer'):
                 gen_version_file()
 
         with pip_conf(root_dir):
@@ -134,13 +132,11 @@ if __name__ == '__main__':
 
                 pull_FROM_on_force = False
                 image_config = {}
-                if image in config.sections():
-                    image_config = config.options(image)
-                    if 'pull_FROM_on_force' in image_config:
-                        pull_FROM_on_force = config.get(image, 'pull_FROM_on_force')
+                if config.has_section(image) and config.has_option(image, 'pull_FROM_on_force'):
+                    pull_FROM_on_force = config.get(image, 'pull_FROM_on_force')
 
                 if os.path.isfile('docker/{image}/Dockerfile'.format(image=image)):
-                    rc = fn(image, image_name, image_tag, config=image_config,
+                    rc = fn(image, image_name, image_tag, config=config,
                             pull=args.pull_base or (args.force_build_base and pull_FROM_on_force))
                     # because an image may not be present on the clean, ignore a non-zero return code
                     if rc and not args.image == 'clean':
