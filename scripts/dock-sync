@@ -19,10 +19,10 @@ function do-sync-up() {
 
     local RESPONSE
     local DESTRUCTIVE=""
-    echo ""
-    echo -e "${GREEN}Use 'delete' option with rsync (destructive)? ${RED}enter${GREEN} to bypass, ${RED}y${GREEN} to use 'delete': ${NO_COLOR}"
-    read RESPONSE
-    if [ "$RESPONSE" = "y" ]; then DESTRUCTIVE="--delete"; fi
+#    echo ""
+#    echo -e "${GREEN}Use 'delete' option with rsync (destructive)? ${RED}enter${GREEN} to bypass, ${RED}y${GREEN} to use 'delete': ${NO_COLOR}"
+#    read RESPONSE
+#    if [ "$RESPONSE" = "y" ]; then DESTRUCTIVE="--delete"; fi
 
     echo rsync -azq ${DESTRUCTIVE} ${HAS_DOCKERIGNORE:+--filter=":- .dockerignore"} -e "ssh -o LogLevel=error -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" $1 $2
     rsync -azq ${DESTRUCTIVE} \
@@ -39,10 +39,10 @@ function do-sync-down() {
 
     local RESPONSE
     local DESTRUCTIVE=""
-    echo ""
-    echo -e "${GREEN}Use 'delete' option with rsync (destructive)? ${RED}enter${GREEN} to bypass, ${RED}y${GREEN} to use 'delete': ${NO_COLOR}"
-    read RESPONSE
-    if [ "$RESPONSE" = "y" ]; then DESTRUCTIVE="--delete"; fi
+#    echo ""
+#    echo -e "${GREEN}Use 'delete' option with rsync (destructive)? ${RED}enter${GREEN} to bypass, ${RED}y${GREEN} to use 'delete': ${NO_COLOR}"
+#    read RESPONSE
+#    if [ "$RESPONSE" = "y" ]; then DESTRUCTIVE="--delete"; fi
 
     echo rsync -azq ${DESTRUCTIVE} ${HAS_DOCKERIGNORE:+--filter=".- .dockerignore"}  ${3:+--exclude=$3} -e "ssh -o LogLevel=error -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" $1 $2
     rsync -azq ${DESTRUCTIVE} \
