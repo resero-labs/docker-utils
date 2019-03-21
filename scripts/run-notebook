@@ -7,6 +7,23 @@ DOCKER_ENV=""
 
 . dock-sync
 
+# Parse command line arguments in any order
+gflag=''
+regflag='true'
+while getopts 'g' flag; do    # if a character is followed by a colon, that argument is expected to have an argument.
+  case "${flag}" in
+    g) gflag='-g';;
+    *) error "Unexpected option ${flag}" ;;
+  esac
+done
+
+DOCKER_TAG='latest'
+GPU_OPTS=''
+if [ -n "$gflag" ]; then
+    DOCKER_TAG='gpu'
+    GPU_OPTS='--runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all'
+fi
+
 if [ "$DOCKER_DS_DIFFS" != "no_diffs" ]; then
     DOCKER_ENV="-e DOCKER_DS_DIFFS=1"
 fi
@@ -15,16 +32,16 @@ if [ -d "./docker/notebook" ]; then
     build-image -f notebook
     if [ -z "$DOCKER_HOST" ]
     then
-        run-image notebook
+        run-image $gflag notebook
     else
         sync-up
-        run-image notebook
+        run-image $gflag notebook
         sync-down
     fi
 else
     # Script to run rappdw/docker-ds notebok against the current directory
     if [ "$DOCKER_DS_DONT_PULL" = "pull" ]; then
-        docker pull rappdw/docker-ds:latest
+        docker pull rappdw/docker-ds:$DOCKER_TAG
     fi
 
     date_stamp=$(date "+%Y_%m_%d_%H.%M.%S")
@@ -46,12 +63,12 @@ else
                 volume_mounts="--mount type=bind,source=$(pwd),target=/home/jovyan/project"
             fi
         fi
-        echo 'docker run --init --name '$USER'_notebook_'$date_stamp' '$DOCKER_ENV' -e NOTEBOOK_MODE=lab --rm -it '$volume_mounts' -p 8888:8888 rappdw/docker-ds:latest'
-        docker run --init --name $USER"_notebook_"$date_stamp $DOCKER_ENV -e NOTEBOOK_MODE=lab --rm -it $volume_mounts -p 8888:8888 rappdw/docker-ds:latest
+        echo 'docker run '$GPU_OPTS' --init --name '$USER'_notebook_'$date_stamp' '$DOCKER_ENV' -e NOTEBOOK_MODE=lab --rm -it '$volume_mounts' -p 8888:8888 rappdw/docker-ds:'$DOCKER_TAG
+        docker run $GPU_OPTS --init --name $USER"_notebook_"$date_stamp $DOCKER_ENV -e NOTEBOOK_MODE=lab --rm -it $volume_mounts -p 8888:8888 rappdw/docker-ds:$DOCKER_TAG
     else
         sync-up
-        echo 'docker run --init --name '$USER'_notebook_'$date_stamp' '$DOCKER_ENV' -e NOTEBOOK_MODE=lab --rm -it --mount type=bind,source=/data/workspaces/'$USER'/code/'${PWD##*/}',target=/home/jovyan/project -v /data:/data -p 8888:8888 rappdw/docker-ds:latest'
-        docker run --init --name $USER"_notebook_"$date_stamp $DOCKER_ENV -e NOTEBOOK_MODE=lab --rm -it --mount type=bind,source="/data/workspaces/"$USER"/code/"${PWD##*/}",target=/home/jovyan/project" -v /data:/data -p 8888:8888 rappdw/docker-ds:latest
+        echo 'docker run '$GPU_OPTS' --init --name '$USER'_notebook_'$date_stamp' '$DOCKER_ENV' -e NOTEBOOK_MODE=lab --rm -it --mount type=bind,source=/data/workspaces/'$USER'/code/'${PWD##*/}',target=/home/jovyan/project -v /data:/data -p 8888:8888 rappdw/docker-ds:'$DOCKER_TAG
+        docker run --init $GPU_OPTS --name $USER"_notebook_"$date_stamp $DOCKER_ENV -e NOTEBOOK_MODE=lab --rm -it --mount type=bind,source="/data/workspaces/"$USER"/code/"${PWD##*/}",target=/home/jovyan/project" -v /data:/data -p 8888:8888 rappdw/docker-ds:$DOCKER_TAG
         sync-down
     fi
 
