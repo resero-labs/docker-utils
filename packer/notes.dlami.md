@@ -1,6 +1,6 @@
 # Notes on using the AWS DL AMI as the base image
 
-We are using verison 21.0 (ami-0b294f219d14e6a82) currently, but have modified it (by hand) to create our base image
+We are using verison 22.0 (ami-01a4e5be5f289dd12) currently, but have modified it (by hand) to create our base image
 The modifications are as follows:
 
 1) ssh into image

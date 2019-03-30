@@ -1,7 +1,7 @@
 {
   "builders": [
     {
-      "ami_name": "resero-labs-dlami-2019.01-b21.0",
+      "ami_name": "resero-labs-dlami-2019.03-b22.0",
       "type": "amazon-ebs",
       "force_deregister": "true",
       "instance_type": "p3.2xlarge",
@@ -22,12 +22,12 @@
         "sg-b93e0dc2",
         "sg-1bd90461"
       ],
-      "source_ami": "ami-0815dee169f6ee034",
+      "source_ami": "ami-06d194a9639948a4c",
       "ssh_username": "ubuntu",
       "iam_instance_profile": "lanista-app",
       "subnet_id": "subnet-b8b440de",
       "tags": {
-        "Name": "resero-labs-dlami-latest"
+        "Name": "resero-labs-dlami-candidate"
       }
     }
   ],
