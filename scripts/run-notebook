@@ -39,9 +39,9 @@ if [ -d "./docker/notebook" ]; then
         sync-down
     fi
 else
-    # Script to run rappdw/docker-ds notebok against the current directory
+    # Script to run resero-labs/docker-ds notebok against the current directory
     if [ "$DOCKER_DS_DONT_PULL" = "pull" ]; then
-        docker pull rappdw/docker-ds:$DOCKER_TAG
+        docker pull resero-labs/docker-ds:$DOCKER_TAG
     fi
 
     date_stamp=$(date "+%Y_%m_%d_%H.%M.%S")
@@ -63,12 +63,12 @@ else
                 volume_mounts="--mount type=bind,source=$(pwd),target=/home/jovyan/project"
             fi
         fi
-        echo 'docker run '$GPU_OPTS' --init --name '$USER'_notebook_'$date_stamp' '$DOCKER_ENV' -e NOTEBOOK_MODE=lab --rm -it '$volume_mounts' -p 8888:8888 rappdw/docker-ds:'$DOCKER_TAG
-        docker run $GPU_OPTS --init --name $USER"_notebook_"$date_stamp $DOCKER_ENV -e NOTEBOOK_MODE=lab --rm -it $volume_mounts -p 8888:8888 rappdw/docker-ds:$DOCKER_TAG
+        echo 'docker run '$GPU_OPTS' --init --name '$USER'_notebook_'$date_stamp' '$DOCKER_ENV' -e NOTEBOOK_MODE=lab --rm -it '$volume_mounts' -p 8888:8888 resero-labs/docker-ds:'$DOCKER_TAG
+        docker run $GPU_OPTS --init --name $USER"_notebook_"$date_stamp $DOCKER_ENV -e NOTEBOOK_MODE=lab --rm -it $volume_mounts -p 8888:8888 resero-labs/docker-ds:$DOCKER_TAG
     else
         sync-up
-        echo 'docker run '$GPU_OPTS' --init --name '$USER'_notebook_'$date_stamp' '$DOCKER_ENV' -e NOTEBOOK_MODE=lab --rm -it --mount type=bind,source=/data/workspaces/'$USER'/code/'${PWD##*/}',target=/home/jovyan/project -v /data:/data -p 8888:8888 rappdw/docker-ds:'$DOCKER_TAG
-        docker run --init $GPU_OPTS --name $USER"_notebook_"$date_stamp $DOCKER_ENV -e NOTEBOOK_MODE=lab --rm -it --mount type=bind,source="/data/workspaces/"$USER"/code/"${PWD##*/}",target=/home/jovyan/project" -v /data:/data -p 8888:8888 rappdw/docker-ds:$DOCKER_TAG
+        echo 'docker run '$GPU_OPTS' --init --name '$USER'_notebook_'$date_stamp' '$DOCKER_ENV' -e NOTEBOOK_MODE=lab --rm -it --mount type=bind,source=/data/workspaces/'$USER'/code/'${PWD##*/}',target=/home/jovyan/project -v /data:/data -p 8888:8888 resero-labs/docker-ds:'$DOCKER_TAG
+        docker run --init $GPU_OPTS --name $USER"_notebook_"$date_stamp $DOCKER_ENV -e NOTEBOOK_MODE=lab --rm -it --mount type=bind,source="/data/workspaces/"$USER"/code/"${PWD##*/}",target=/home/jovyan/project" -v /data:/data -p 8888:8888 resero-labs/docker-ds:$DOCKER_TAG
         sync-down
     fi
 

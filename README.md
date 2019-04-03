@@ -73,11 +73,11 @@ the docker file to the defined repository (AWS or Docker)
 
 ### Notebook cli
 `run-notebook` will start a docker container using either the notebook container found in the `docker/notebook` directory
-if it exists, or [rappdw/docker-ds](https://github.com/rappdw/docker-ds) otherwise. The current directory will be mounted
+if it exists, or [resero-labs/docker-ds](https://github.com/resero-labs/docker-ds) otherwise. The current directory will be mounted
 into the container for use in the Juypter notebook environment. There are a couple of environment variable to be aware of 
 with this command:
 
-* DOCKER_DS_DONT_PULL - if set, the version of rappdw/docker-ds currently available will be used rather than pulling 
+* DOCKER_DS_DONT_PULL - if set, the version of resero-labs/docker-ds currently available will be used rather than pulling 
 the latest version from docker hub.
 * RESERO_JUPYTER_DIFFS - if set, on save, `.py` files and `.html` files for the notebook will be created in a `.diffs` subdirectory.  
 
@@ -141,7 +141,7 @@ name=dev
 ### Configuration-only Images
 If there is a docker container that does what you want already, you can create a configuration-only image by 
 specifying `name`, `tag` and `prefix=False` in the configuration section for the image. For example the base notebook 
-image `rappdw/docker-ds` is often sufficient for running a Jupyter notebook against your code, as it auto detects a 
+image `resero-labs/docker-ds` is often sufficient for running a Jupyter notebook against your code, as it auto detects a 
 `setup.py` upon container start and installs the module into the notebook environment.
 
 ### Image Tagging
