@@ -94,7 +94,7 @@ if __name__ == '__main__':
             config_versioneer = ConfigParser()
             config_versioneer.optionxform = str
             config_versioneer.read('setup.cfg')
-            if config.has_section('versioneer'):
+            if config_versioneer.has_section('versioneer'):
                 gen_version_file()
 
         with pip_conf(root_dir):
