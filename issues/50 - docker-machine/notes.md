@@ -60,10 +60,16 @@ This results in:
 
 `Cannot connect to the Docker daemon at http://docker. Is the docker daemon running?`
 
+**Resolved**: Turns out this was due to the `ubuntu` user not being in the `docker` group a simple: `sudo usermod -aG docker ubuntu` fixes this.
+
+### Timings of ssh
 ```
 docker -H ssh://10.93.128.97 images       --  0.03s user 0.02s system 2% cpu 2.261 total
 docker -H tcp://10.93.128.97:2377 images  --  0.04s user 0.02s system 7% cpu 0.813 total
 
 docker -H ssh://10.93.128.97 run -ti alpine echo “hello”       -- 0.05s user 0.04s system 1% cpu 7.095 total
 docker -H tcp://10.93.128.97:2377 run -ti alpine echo “hello”  -- 0.05s user 0.10s system 4% cpu 2.959 total
+
+docker -H ssh://10.93.128.97 run -ti --rm alpine sleep 30       -- 0.06s user 0.04s system 0% cpu 38.239 total
+docker -H tcp://10.93.128.97:2377 run -ti --rm alpine sleep 30  -- 0.05s user 0.03s system 0% cpu 32.623 total
 ```
