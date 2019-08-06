@@ -21,7 +21,7 @@ else:
 
 
 _base_cmd = 'docker run {init} --name {name} {environment} {keep_container} {interactive} {gpu} {network} ' \
-            '{volumes} {ports} {args} {image_name}:{image_tag} {cmd}'
+            '{volumes} {ports} {args} {image_name}:{image_tag} "{cmd}"'
 
 
 def fetch_env_variables(config, image, args_env=None):
