@@ -1,10 +1,10 @@
 # How to Build/Deploy a Resero-labs dlami
 
-We are using verison 22.0 (ami-01a4e5be5f289dd12) currently, but have modified it (by hand) to create our base image
+We are using verison 23.0 (ami-058f26d848e91a4e8) currently, but have modified it (by hand) to create our base image
 
 1) create instance of DLAMI. (Watch for updates [Deep Learning AMI (Ubuntu)](https://aws.amazon.com/marketplace/pp/B077GCH38C).) 
 
-    `create-dock -a ami-01a4e5be5f289dd12 -s -m base-ami -i p3.2xlarge`
+    `create-dock -a ami-058f26d848e91a4e8 -s -m base-ami -i p3.2xlarge`
 2) ssh into image.
  
     `ssh-dock base-ami`
@@ -26,10 +26,15 @@ that looks like: `2019-01-24 17:52:10,320 INFO All upgrades installed` (should b
     ```
 6) reboot and ensure that nvidia drivers still good
 
-    `nvidia-smi`
+    ```bash 
+    stop-dock base-ami
+    start-dock base-ami
+    ssh-dock base-ami
+    nvidia-smi
+    ```
 7) Create an image from this instance
 
-    `aws ec2 create-image --instance-id i-0238495638422d858 --name resero-labs-dlami-base-22.0-2019.04`
+    `aws ec2 create-image --instance-id i-0696b5c8f549f88f2 --name resero-labs-dlami-base-23.0-2019.06`
 
     (Instance id can be found in the console or in  `~/.docker/<ip-addr>/connection_config.txt`. 
     AMI name should follow the convention `resero-labs-dlami-base-<dlami-version>-<date-created>`)
@@ -56,4 +61,7 @@ that looks like: `2019-01-24 17:52:10,320 INFO All upgrades installed` (should b
     ```
 
 11) Switch names of previous resero-labs-dlami with the one just created
+
+    rotate existing `resero-labs-dlami-ssh` to a dated version, e.g. `resero-labs-dlami-ssh-2019.06`
+    rotate candidate `resero-labs-dlami-candidate-ssh` to `resero-labs-dlami-ssh`
 
