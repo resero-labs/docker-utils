@@ -129,7 +129,7 @@ if __name__ == '__main__':
             gpu = ''
 
         run_config = {
-            'environment': fetch_env_variables(config, args.image, args.env) + populate_aws_env_variables(),
+            'environment': fetch_env_variables(config, args.image, args.env) + ' ' + populate_aws_env_variables(),
             'keep_container': args.keep or '--rm',
             'interactive': '-d' if args.keep else '-it',
             'gpu': gpu,
