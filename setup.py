@@ -43,7 +43,8 @@ setup_options = dict(
         'scripts/ssh-dock',
         'scripts/start-dock',
         'scripts/stop-dock',
-        'scripts/transfer-image'
+        'scripts/transfer-image',
+        'scripts/unregister-dock'
     ],
     include_package_data=True,
     packages=find_packages(exclude=['tests*']),
