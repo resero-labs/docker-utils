@@ -21,13 +21,7 @@ else:
 
 
 _base_cmd = 'docker run {init} --name {name} {environment} {keep_container} {interactive} {gpu} {network} ' \
-            '{volumes} {ports} {args} {image_name}:{image_tag} "{cmd}"'
-
-# if we don't have a command, don't surround it in quotes, doing so cause a nop to be executed and the container
-# to exit
-_base_cmd_no_cmd = 'docker run {init} --name {name} {environment} {keep_container} {interactive} {gpu} {network} ' \
-            '{volumes} {ports} {args} {image_name}:{image_tag} {cmd}'
-
+            '{volumes} {ports} {args} {image_name}:{image_tag}'
 
 def fetch_env_variables(config, image, args_env=None):
     # a special use case. retrieve env variables from a config server.
@@ -74,30 +68,29 @@ def run(mode, image_name, image_tag, **kwargs):
         kwargs['network'] = "--network {network}".format(network=kwargs['network'])
 
     timestamp = datetime.datetime.now().strftime("%y-%m-%d_%H.%M.%S")
-    command_to_format = _base_cmd_no_cmd
-    if kwargs['cmd']:
-        command_to_format = _base_cmd
-    cmd = command_to_format.format(image_name=image_name,
-                                   image_tag=image_tag,
-                                   name="{user}_{mode}_{timestamp}".format(
-                                       user=getpass.getuser(), mode=mode, timestamp=timestamp),
-                                   keep_container=kwargs['keep_container'],
-                                   interactive=kwargs['interactive'],
-                                   environment=kwargs['environment'],
-                                   network=kwargs['network'],
-                                   ports=kwargs['ports'],
-                                   args=kwargs['args'],
-                                   volumes=volumes,
-                                   gpu=kwargs['gpu'],
-                                   cmd=kwargs['cmd'],
-                                   init=kwargs['init'])
+    cmd = _base_cmd.format(image_name=image_name,
+                           image_tag=image_tag,
+                           name="{user}_{mode}_{timestamp}".format(
+                               user=getpass.getuser(), mode=mode, timestamp=timestamp),
+                           keep_container=kwargs['keep_container'],
+                           interactive=kwargs['interactive'],
+                           environment=kwargs['environment'],
+                           network=kwargs['network'],
+                           ports=kwargs['ports'],
+                           args=kwargs['args'],
+                           volumes=volumes,
+                           gpu=kwargs['gpu'],
+                           init=kwargs['init'])
     print('\n\n============================================================================')
-    print('{cmd}\n\n'.format(cmd=cmd))
+    print("{cmd} {kwcmd}\n\n".format(cmd=cmd, kwcmd=kwargs['cmd'] or ''))
 
     # Since we are using secure env values I don't want those to print in the above commmand, but
     #   they need to be expanded for the subprocess.call
     expanded_cmd = Template(cmd).substitute(os.environ)
-    return subprocess.call(shlex.split(expanded_cmd), cwd=os.getcwd())
+    expanded_kwargs_cmd = Template(kwargs['cmd'] or '').substitute(os.environ)
+
+    all_args = shlex.split(expanded_cmd) + shlex.split(expanded_kwargs_cmd)
+    return subprocess.call(all_args, cwd=os.getcwd())
 
 
 if __name__ == '__main__':
@@ -136,7 +129,7 @@ if __name__ == '__main__':
             'network': args.network or '',
             'volumes': '',
             'ports': '',
-            'cmd': args.command or '',
+            'cmd': args.command or None,
             'init': '--init',
             'args': args.args
         }
