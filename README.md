@@ -13,12 +13,12 @@ ec2 instance in AWS; allow for multiple images per project; etc.
 
 Perhaps the best way to think of dockerutils is that it embodies two entities, commonly used when working
 with docker, and a set of complementary commands for working with those entities. The two entities are:
-* "dock" - the server that is hosing docker (by default, localhost)
+* "dock" - the server that is hosting docker (by default, localhost)
 * image - the standard docker image
 
 The commands used to operate against these entities are:
 
-| CommandSet /  Entity |         Creation         |       Execution      |   Notebook   |            Utility           |
+| CommandSet /  Entity |         Creation         |       Execution      |   Jupyter <br/> Notebook   |            Utility           |
 |----------------------|:------------------------:|:--------------------:|:------------:|:----------------------------:|
 |         Dock         | create-dock <br/> destroy-dock | start-dock <br/> stop-dock | nb-dock      | source dock <br/> ls-dock <br/> ssh-dock |
 |         Image        | build-image              | run-image            | run-notebook | publish-image <br/> transfer-image |
